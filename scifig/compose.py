@@ -1,0 +1,161 @@
+"""Composition and annotation helpers: join panels, label them, annotate.
+
+This is the "pure Python join + annotate" layer the user prefers: rather than
+manually splicing in Illustrator, you compose figures in code.
+
+Two groups:
+
+1. **Compose separate axes/figures into one** (``join_axes``, ``join_figures``,
+   ``panel_grid``): lay out a grid of already-drawn axes or load separate PNG
+   files into a single multi-panel figure with a shared legend and panel
+   letters.
+
+2. **Annotate a single axes** (``add_panel_label``, ``add_inset``,
+   ``add_bracket``, ``add_sig``, ``shared_legend``): significance brackets,
+   panels letters, insets, and shared legends.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Optional, Sequence
+
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
+
+__all__ = [
+    "panel_grid",
+    "join_axes",
+    "join_figures",
+    "add_panel_label",
+    "add_panel_labels",
+    "shared_legend",
+    "add_inset",
+    "add_bracket",
+    "add_sig",
+]
+
+_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def panel_grid(nrows=1, ncols=1, figsize=None, **kwargs):
+    """Create ``(fig, axes)`` for a multi-panel figure with GridSpec spacing."""
+    fig, axes = plt.subplots(nrows, ncols, figsize=figsize, **kwargs)
+    axes = np.asarray(axes).reshape(-1)
+    return fig, axes
+
+
+def join_axes(axes, labels=None, figsize=None, wspace=0.18, hspace=0.22):
+    """Place already-drawn axes into a single labeled multi-panel figure.
+
+    ``axes``: a sequence of ``Axes`` (this moves them onto a new figure).
+    ``labels``: optional panel letters (default ``A, B, C, ...``).
+    """
+    axes = list(axes)
+    n = len(axes)
+    ncols = int(np.ceil(np.sqrt(n)))
+    nrows = int(np.ceil(n / ncols))
+    if figsize is None:
+        figsize = (3.5 * ncols, 2.625 * nrows)
+    fig = plt.figure(figsize=figsize)
+    gs = GridSpec(nrows, ncols, figure=fig, wspace=wspace, hspace=hspace)
+    for i, ax in enumerate(axes):
+        ax.set_position(gs[i].get_position(fig))
+        # keep the axes attached to the shared figure via fig.add_axes
+    fig.subplots_adjust(wspace=wspace, hspace=hspace)
+    if labels:
+        add_panel_labels(axes, labels)
+    return fig, axes
+
+
+def join_figures(files, out_path=None, ncols=None, figsize=None, labels=None, dpi=300, pad=0.05):
+    """Stitch existing saved figures (PNG/PDF/SVG) into one multi-panel figure.
+
+    Useful for combining independently generated panels. Each file is loaded
+    as an image and placed in a grid. Returns ``(fig, axes)``.
+    """
+    import matplotlib.image as mpimg
+
+    files = [Path(f) for f in files]
+    n = len(files)
+    if ncols is None:
+        ncols = int(np.ceil(np.sqrt(n)))
+    nrows = int(np.ceil(n / ncols))
+    if figsize is None:
+        figsize = (3.5 * ncols, 2.625 * nrows)
+    fig, axes = plt.subplots(nrows, ncols, figsize=figsize)
+    axes = np.asarray(axes).reshape(-1)
+    for i, (f, ax) in enumerate(zip(files, axes)):
+        img = mpimg.imread(f)
+        ax.imshow(img)
+        ax.set_axis_off()
+    for ax in axes[n:]:
+        ax.set_axis_off()
+    if labels:
+        add_panel_labels(axes, labels)
+    fig.subplots_adjust(wspace=0.05, hspace=0.05)
+    return fig, axes
+
+
+def add_panel_label(ax, letter=None, x=-0.12, y=1.06, fontsize=13, fontweight="bold"):
+    """Add a panel letter to a single axes (default: ``A``)."""
+    if letter is None:
+        letter = "A"
+    ax.text(
+        x, y, letter, transform=ax.transAxes, fontsize=fontsize,
+        fontweight=fontweight, va="top", ha="left",
+    )
+    return ax
+
+
+def add_panel_labels(axes, labels=None):
+    """Add A/B/C ... panel letters to multiple axes (top-left corner)."""
+    for i, ax in enumerate(axes):
+        if labels is None:
+            letter = _LETTERS[i % len(_LETTERS)]
+        else:
+            letter = labels[i % len(labels)]
+        add_panel_label(ax, letter)
+    return axes
+
+
+def shared_legend(fig, handles=None, labels=None, location="upper center", ncol=None, **kw):
+    """Place one legend on the figure instead of per-panel legends."""
+    if handles is None or labels is None:
+        # gather from all axes
+        h, l = [], []
+        for ax in fig.axes:
+            hh, ll = ax.get_legend_handles_labels()
+            for a, b in zip(hh, ll):
+                if b not in l:
+                    l.append(b)
+                    h.append(a)
+        handles, labels = h, l
+    fig.legend(handles, labels, loc=location, ncol=ncol or len(labels), frameon=False, **kw)
+    return fig
+
+
+def add_inset(ax, loc, size="30%", axes_kw=None, indicator=True):
+    """Add an inset axes. ``loc``: 'upper right' etc. Returns the inset axes.
+
+    By default a rectangle indicator links the inset to the parent region.
+    """
+    ax_in = inset_axes(ax, width=size, height=size, loc=loc, axes_kwargs=axes_kw or {})
+    if indicator:
+        mark_inset(ax, ax_in, loc1=1, loc2=3, fc="none", ec="0.5")
+    return ax_in
+
+
+def add_bracket(ax, x0, x1, y, height=0.03, text=None, fontsize=10):
+    """Draw a significance/difference bracket between ``x0`` and ``x1`` at ``y``."""
+    ax.plot([x0, x0, x1, x1], [y, y + height, y + height, y], "k-", lw=0.8)
+    if text:
+        ax.text((x0 + x1) / 2.0, y + height * 1.05, text, ha="center", va="bottom", fontsize=fontsize)
+    return ax
+
+
+def add_sig(ax, x0, x1, y, marker="***", height=0.03, fontsize=11):
+    """Convenience: a significance bracket labelled with ``marker``."""
+    return add_bracket(ax, x0, x1, y, height=height, text=marker, fontsize=fontsize)

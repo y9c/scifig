@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Generated figure outputs (regenerable via demos/scripts)
+figures/
+*.png
+*.pdf
+*.svg
+*.eps
+!examples/**/*.png
+!examples/**/*.pdf
+
+# OS
+.DS_Store
+
+# Original packaged skill zip (contents already unzipped into skill/ and scifig/)
+scientific-figures-skill.zip
