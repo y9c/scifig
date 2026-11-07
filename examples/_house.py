@@ -103,23 +103,28 @@ def panel_letters(axes, case="lower"):
         panel_label(ax, letter)
 
 
-def readable_ticks(ax, n=5):
-    """Deliberate tick density + minor ticks."""
+def readable_ticks(ax, n=5, axis="y"):
+    """Deliberate tick density + minor ticks (default: y only, so discrete/categorical
+    x-axes keep their labels)."""
     from matplotlib.ticker import MaxNLocator, AutoMinorLocator
-    ax.yaxis.set_major_locator(MaxNLocator(nbins=n, integer=False))
-    ax.xaxis.set_major_locator(MaxNLocator(nbins=n, integer=False))
-    ax.xaxis.set_minor_locator(AutoMinorLocator(2))
-    ax.yaxis.set_minor_locator(AutoMinorLocator(2))
-    ax.tick_params(which="minor", length=2.0, width=0.4)
-    ax.tick_params(which="major", length=3.2, width=0.6)
+    if axis in ("y", "both"):
+        ax.yaxis.set_major_locator(MaxNLocator(nbins=n, integer=False))
+        ax.yaxis.set_minor_locator(AutoMinorLocator(2))
+        ax.tick_params(which="minor", length=2.0, width=0.4)
+        ax.tick_params(which="major", length=3.2, width=0.6)
+    if axis in ("x", "both"):
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=n, integer=False))
+        ax.xaxis.set_minor_locator(AutoMinorLocator(2))
 
 
-def finish(ax, grid=False, xlabel=None, ylabel=None, title=None):
-    """One-call polish."""
+def finish(ax, grid=False, xlabel=None, ylabel=None, title=None, ticks=True):
+    """One-call polish. ``ticks``-> 'y' (default; keeps categorical x labels)
+    | 'both' | 'x' | False."""
     if xlabel: ax.set_xlabel(xlabel)
     if ylabel: ax.set_ylabel(ylabel)
     if title: ax.set_title(title, pad=4)
-    readable_ticks(ax)
+    if ticks:
+        readable_ticks(ax, axis=ticks)
     if grid:
         ax.grid(True, color="#DDDDDD", alpha=0.5, linewidth=0.5)
         ax.set_axisbelow(True)
@@ -270,3 +275,103 @@ def add_inset(ax, loc, size="30%"):
     """Return an inset axes."""
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
     return inset_axes(ax, width=size, height=size, loc=loc)
+
+
+# --- more common plot builders ---
+def boxplot(ax, data, labels=None, palette="wong", ylabel="Value", widths=0.6):
+    """Per-group box plot; boxes filled with a colorblind-safe palette."""
+    data = [np.asarray(d, float) for d in data]
+    pal = FRIENDLY.get(palette, FRIENDLY["wong"])
+    bp = ax.boxplot(data, patch_artist=True, widths=widths,
+                    showfliers=False, medianprops=dict(color="black"))
+    for i, patch in enumerate(bp["boxes"]):
+        patch.set_facecolor(pal[i % len(pal)])
+        patch.set_alpha(0.7)
+    ax.set_xticks(np.arange(1, len(data) + 1))
+    ax.set_xticklabels(labels if labels else [str(i + 1) for i in range(len(data))],
+                       rotation=30, ha="right")
+    ax.set_ylabel(ylabel)
+    return bp
+
+
+def pie(ax, values, labels, colors=None, startangle=90, counterclock=False, pct=True):
+    """Donut/pie (flat look, no 3D); returns (wedges, texts)."""
+    vals = np.asarray(values, float)
+    pal = colors or FRIENDLY["wong"]
+    out = ax.pie(vals, labels=labels, colors=[pal[i % len(pal)] for i in range(len(vals))],
+                 startangle=startangle, counterclock=counterclock,
+                 autopct="%1.1f%%" if pct else None, pctdistance=0.75,
+                 wedgeprops=dict(edgecolor="white", linewidth=1.2))
+    ax.set_aspect("equal")
+    return out
+
+
+def scatter_fit(ax, x, y, degree=1, label="data", color=None, fit=True):
+    """Scatter + least-squares polynomial fit + 95% CI band."""
+    x = np.asarray(x, float); y = np.asarray(y, float)
+    color = color or PALETTE["blue_main"]
+    ax.scatter(x, y, s=16, color=color, alpha=0.7, label=label)
+    if fit and len(x) > degree + 1:
+        coef = np.polyfit(x, y, degree)
+        xs = np.linspace(x.min(), x.max(), 200)
+        yhat = np.polyval(coef, xs)
+        resid = y - np.polyval(coef, x)
+        se = np.sqrt(np.sum(resid ** 2) / (len(x) - degree - 1))
+        ax.plot(xs, yhat, color="k", lw=1.0, label="Fit")
+        ax.fill_between(xs, yhat - 1.96 * se, yhat + 1.96 * se, color=color,
+                        alpha=0.12, linewidth=0, label="95% CI")
+    return ax
+
+
+def roc_curve(ax, y_true, y_score, label=None, color=None):
+    """ROC curve + AUC (no sklearn needed)."""
+    yt = np.asarray(y_true).astype(int)
+    sc = np.asarray(y_score, float)
+    order = np.argsort(-sc)
+    yt = yt[order]
+    P, N = yt.sum(), (yt == 0).sum()
+    tpr = np.concatenate([[0], np.cumsum(yt) / max(P, 1)])
+    fpr = np.concatenate([[0], np.cumsum(1 - yt) / max(N, 1)])
+    auc = float(np.sum(np.diff(fpr) * (tpr[1:] + tpr[:-1]) / 2))
+    color = color or PALETTE["blue_main"]
+    lab = (f"{label} " if label else "") + f"AUC={auc:.3f}"
+    ax.plot(fpr, tpr, color=color, lw=1.4, label=lab)
+    ax.plot([0, 1], [0, 1], ls="--", color="0.7", lw=0.7)
+    ax.set_xlabel("False positive rate"); ax.set_ylabel("True positive rate")
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1.02)
+    ax.legend(frameon=False, fontsize=6, loc="lower right")
+    return auc
+
+
+def confusion(ax, cm, labels=None, cmap="Blues"):
+    """Confusion matrix (counts) with annotation."""
+    m = np.asarray(cm, float)
+    im = ax.imshow(m, cmap=cmap, aspect="auto")
+    for i in range(m.shape[0]):
+        for j in range(m.shape[1]):
+            ax.text(j, i, f"{int(m[i, j])}", ha="center", va="center",
+                    color="white" if m[i, j] > m.max() / 2 else "black", fontsize=6)
+    ax.set_xticks(np.arange(m.shape[1])); ax.set_yticks(np.arange(m.shape[0]))
+    if labels is not None:
+        ax.set_xticklabels(labels, rotation=40, ha="right")
+        ax.set_yticklabels(labels)
+    ax.set_xlabel("Predicted"); ax.set_ylabel("True")
+    ax.figure.colorbar(im, ax=ax, shrink=0.8)
+    return im
+
+
+def stacked_bar(ax, categories, parts, labels, colors=None, ylabel="Value"):
+    """Stacked composition bar (legend above, so it never overlaps bars)."""
+    parts = [np.asarray(p, float) for p in parts]
+    x = np.arange(len(categories))
+    pal = colors or FRIENDLY["wong"]
+    bottoms = np.zeros(len(categories))
+    for i, (p, lab) in enumerate(zip(parts, labels)):
+        ax.bar(x, p, bottom=bottoms, label=lab, color=pal[i % len(pal)],
+               edgecolor="white", linewidth=0.5)
+        bottoms += p
+    ax.set_xticks(x); ax.set_xticklabels(categories)
+    ax.set_ylabel(ylabel)
+    ax.legend(frameon=False, ncol=len(labels), loc="upper center",
+              bbox_to_anchor=(0.5, 1.12), fontsize=6, handlelength=1.0)
+    return ax

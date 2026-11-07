@@ -44,6 +44,12 @@ Value labels above bars. `readable_ticks(ax, n=5)` sets deliberate tick density.
 | `trend` | `(ax, x, ys, labels, colors, ours_marker, ylabel, xlabel, show_shadow)` — 2-col `(mean, std)` series draws a CI band |
 | `heatmap` | `(ax, matrix, x_labels, y_labels, cmap, cbar_label, annotate)` |
 | `scatter` | `(ax, x, y, label, color, size, alpha)` |
+| `boxplot` | `(ax, data, labels, palette, ylabel, widths)` |
+| `pie` | `(ax, values, labels, colors, startangle, counterclock, pct)` |
+| `scatter_fit` | `(ax, x, y, degree, label, color, fit)` — +95% CI band |
+| `roc_curve` | `(ax, y_true, y_score, label, color)` — +AUC (no sklearn) |
+| `confusion` | `(ax, cm, labels, cmap)` — annotated |
+| `stacked_bar` | `(ax, categories, parts, labels, colors, ylabel)` — legend above |
 | `grid` | `(nrows, ncols, width, aspect, wspace, hspace)` → `(fig, axes_flat)` |
 | `shared_legend` | `(fig, labels, handles, location, ncol, clear)` |
 | `join_figures` | `(files, out, ncols, labels, dpi)` — stitch saved panels |

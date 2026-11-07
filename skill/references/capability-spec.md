@@ -37,9 +37,16 @@ recipes** — the agent reads the example and re-implements in the user's env.
 | Figure type | Reference example |
 |-------------|-------------------|
 | Grouped / single bars (+ error bars) | `examples/grouped_bar.py`, `benchmark_parity.py` |
+| Box plot (per-group distribution) | `examples/boxplot.py` |
+| Stacked composition bar | `examples/stacked_bar.py` |
+| Donut / pie (composition) | `examples/pie.py` |
 | Trend / curves + confidence band | `examples/trends_grid.py` |
 | Heatmap + colorbar | `examples/heatmap.py` |
 | Scatter | `examples/compose_annotate.py` |
+| Scatter + fit / regression + CI | `examples/scatter_fit.py` |
+| ROC curves + AUC | `examples/roc.py` |
+| Confusion matrix | `examples/confusion.py` |
+| Kaplan-Meier survival | `examples/survival.py` |
 | Multi-panel grid + shared legend | `examples/benchmark_nature.py` |
 | Quantitative comparison (bars + error + right legend) | `examples/benchmark_parity.py` |
 | Volcano / MA (differential expression) | `examples/biofigs.py`, `examples/single_cell/` |
@@ -48,6 +55,7 @@ recipes** — the agent reads the example and re-implements in the user's env.
 | Protein cartoon (PyMOL, raster) | `examples/proteinfig.py` |
 | Protein topology (matplotlib, vector) | `examples/proteinfig.py`, `showcase_protein.py` |
 | Inset / composition | `examples/showcase_inset.py` |
+| Compose saved panels | `examples/compose_annotate.py` |
 
 > Protein vector-vs-raster: see [protein-rendering.md](protein-rendering.md).
 
