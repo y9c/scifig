@@ -40,11 +40,30 @@ __all__ = [
 _LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-def panel_grid(nrows=1, ncols=1, figsize=None, **kwargs):
-    """Create ``(fig, axes)`` for a multi-panel figure with GridSpec spacing."""
-    fig, axes = plt.subplots(nrows, ncols, figsize=figsize, **kwargs)
-    axes = np.asarray(axes).reshape(-1)
-    return fig, axes
+def panel_grid(nrows=1, ncols=1, figsize=None, legend="bottom", legend_height=0.08, wspace=0.18, hspace=0.30, **kwargs):
+    """Create ``(fig, axes)`` for a multi-panel figure with GridSpec spacing.
+
+    ``legend``: ``'bottom'``/``'top'``/``None`` — reserve a horizontal strip on
+    that side for a shared legend (via ``shared_legend``), so the legend never
+    overlaps the data panels. ``legend_height`` is the strip's fraction of the
+    figure height. Returns ``(fig, axes)`` where ``axes`` is a flat 1D array.
+    """
+    if figsize is None:
+        figsize = (3.5 * ncols, 2.625 * nrows)
+    fig = plt.figure(figsize=figsize)
+    if legend is None:
+        gs = GridSpec(nrows, ncols, figure=fig, wspace=wspace, hspace=hspace)
+        axes = [fig.add_subplot(gs[i, j]) for i in range(nrows) for j in range(ncols)]
+    else:
+        total_rows = nrows + 1
+        if legend == "bottom":
+            gs = GridSpec(total_rows, ncols, figure=fig, wspace=wspace, hspace=hspace,
+                          height_ratios=[1] * nrows + [legend_height])
+        else:  # "top"
+            gs = GridSpec(total_rows, ncols, figure=fig, wspace=wspace, hspace=hspace,
+                          height_ratios=[legend_height] + [1] * nrows)
+        axes = [fig.add_subplot(gs[i, j]) for i in range(nrows) for j in range(ncols)]
+    return fig, np.asarray(axes).reshape(-1)
 
 
 def join_axes(axes, labels=None, figsize=None, wspace=0.18, hspace=0.22):
@@ -99,10 +118,18 @@ def join_figures(files, out_path=None, ncols=None, figsize=None, labels=None, dp
     return fig, axes
 
 
-def add_panel_label(ax, letter=None, x=-0.12, y=1.06, fontsize=13, fontweight="bold"):
-    """Add a panel letter to a single axes (default: ``A``)."""
+def add_panel_label(ax, letter=None, x=0.03, y=0.97, fontsize=None, fontweight="bold"):
+    """Add a panel letter to a single axes (default: uppercase ``A``).
+
+    Defaults to the **top-left, inside the axes** (the common Nature/Science
+    convention) so the letter never collides with y-axis tick labels. Pass
+    ``x``/``y`` to override (e.g. ``x=-0.14, y=1.04`` for an outside-the-axes
+    label). ``fontsize`` defaults to 1.2x the current base font size.
+    """
     if letter is None:
         letter = "A"
+    if fontsize is None:
+        fontsize = 1.2 * plt.rcParams.get("font.size", 10)
     ax.text(
         x, y, letter, transform=ax.transAxes, fontsize=fontsize,
         fontweight=fontweight, va="top", ha="left",
@@ -110,21 +137,33 @@ def add_panel_label(ax, letter=None, x=-0.12, y=1.06, fontsize=13, fontweight="b
     return ax
 
 
-def add_panel_labels(axes, labels=None):
-    """Add A/B/C ... panel letters to multiple axes (top-left corner)."""
-    for i, ax in enumerate(axes):
-        if labels is None:
-            letter = _LETTERS[i % len(_LETTERS)]
-        else:
-            letter = labels[i % len(labels)]
-        add_panel_label(ax, letter)
+def add_panel_labels(axes, labels=None, case="upper", bold=True):
+    """Add panel letters to multiple axes (top-left corner).
+
+    ``case``: ``'upper'`` (default, Science convention → **A, B, C** bold) or
+    ``'lower'`` (Nature convention → a, b, c). Pass explicit ``labels`` to
+    override the auto-generated letters. ``bold`` controls the font weight.
+    """
+    letters = []
+    for i, _ in enumerate(axes):
+        letter = labels[i % len(labels)] if labels else _LETTERS[i % len(_LETTERS)]
+        if case == "lower":
+            letter = letter.lower()
+        letters.append(letter)
+    for ax, letter in zip(axes, letters):
+        add_panel_label(ax, letter, fontweight="bold" if bold else "normal")
     return axes
 
 
-def shared_legend(fig, handles=None, labels=None, location="upper center", ncol=None, **kw):
-    """Place one legend on the figure instead of per-panel legends."""
+def shared_legend(fig, handles=None, labels=None, location="upper center", ncol=None, clear=True, **kw):
+    """Place one legend on the figure instead of per-panel legends.
+
+    ``clear=True`` (default) removes each axes' own legend so the figure has
+    exactly one legend instead of duplicated ones. Pass ``clear=False`` to keep
+    per-panel legends too.
+    """
     if handles is None or labels is None:
-        # gather from all axes
+        # gather from all axes (dedup by label)
         h, l = [], []
         for ax in fig.axes:
             hh, ll = ax.get_legend_handles_labels()
@@ -133,6 +172,10 @@ def shared_legend(fig, handles=None, labels=None, location="upper center", ncol=
                     l.append(b)
                     h.append(a)
         handles, labels = h, l
+    if clear:
+        for ax in fig.axes:
+            if ax.get_legend() is not None:
+                ax.get_legend().remove()
     fig.legend(handles, labels, loc=location, ncol=ncol or len(labels), frameon=False, **kw)
     return fig
 

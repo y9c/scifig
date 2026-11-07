@@ -25,6 +25,12 @@ from .style import (
     save_figure,
     set_hidpi,
     make_figure,
+    nature_single_style,
+    nature_double_style,
+    nature_figsize,
+    NATURE_SINGLE_W,
+    NATURE_HALF_W,
+    NATURE_DOUBLE_W,
 )
 from .palette import (
     PALETTE,
@@ -52,7 +58,20 @@ from .compose import (
     add_sig,
 )
 
-__version__ = "0.1.0"
+from .semantics import SEMANTIC_ROLES, ROLE_CYCLE, role_color, assign_colors
+from .spec import FigureSpec, render_spec, COLUMN_WIDTHS
+from .journals import JOURNAL_SPEC, journal_style, journal_figsize, fig_size_mm
+from .palette import FRIENDLY_PALS, friendly_pal
+from .archetypes import (
+    timeseries_ci, sorted_bar, grouped_bar, scatter_fit, heatmap, tornado, confusion, save,
+)
+from .quality import check_figure, QualityReport, QUALITY_AXES
+from .polish import (
+    finish_axes, finish_figure, ticks_readable, add_minor_ticks,
+    tight_ylim, soft_grid, bar_value_labels,
+)
+
+__version__ = "0.3.0"
 
 __all__ = [
     "FigureStyle",
@@ -65,6 +84,12 @@ __all__ = [
     "save_figure",
     "set_hidpi",
     "make_figure",
+    "nature_single_style",
+    "nature_double_style",
+    "NATURE_SINGLE_W",
+    "NATURE_HALF_W",
+    "NATURE_DOUBLE_W",
+    "nature_figsize",
     "PALETTE",
     "DEFAULT_COLORS",
     "MODERN_COLORS",
@@ -84,5 +109,36 @@ __all__ = [
     "add_inset",
     "add_bracket",
     "add_sig",
+    "SEMANTIC_ROLES",
+    "ROLE_CYCLE",
+    "role_color",
+    "assign_colors",
+    "FigureSpec",
+    "render_spec",
+    "COLUMN_WIDTHS",
+    "JOURNAL_SPEC",
+    "journal_style",
+    "journal_figsize",
+    "fig_size_mm",
+    "FRIENDLY_PALS",
+    "friendly_pal",
+    "timeseries_ci",
+    "sorted_bar",
+    "grouped_bar",
+    "scatter_fit",
+    "heatmap",
+    "tornado",
+    "confusion",
+    "save",
+    "check_figure",
+    "QualityReport",
+    "QUALITY_AXES",
+    "finish_axes",
+    "finish_figure",
+    "ticks_readable",
+    "add_minor_ticks",
+    "tight_ylim",
+    "soft_grid",
+    "bar_value_labels",
     "__version__",
 ]

@@ -43,15 +43,31 @@ neutral = background; highlight = single callout.
 Apply a style **once, before creating figures**. Both are idempotent and set
 rcParams globally via matplotlib.
 
-### scifig.FigureStyle
+### FigureStyle
 
 ```python
 @dataclass(frozen=True)
 class FigureStyle:
-    font_size: int = 16
-    axes_linewidth: float = 2.5
+    font_size: float = 6.0        # base size in pt; every text element scales from it
+    axes_linewidth: float = 1.0   # thin spines (0.8-1.0 for print)
     use_tex: bool = False
-    font_family: tuple[str, ...] = ("DejaVu Sans", "Helvetica", "Arial", "sans-serif")
+    font_family: tuple[str, ...] = ("Arial", "Helvetica", "DejaVu Sans", "sans-serif")
+```
+
+**Arial 5-6pt at final column width** is the Nature recommendation. Because
+`apply_publication_style` scales titles/labels/ticks/legend proportionally from
+`font_size`, set `font_size=6` for a Nature single-column figure.
+
+### Nature presets
+
+```python
+scifig.NATURE_SINGLE_W = 3.50   # Nature single column, inches
+scifig.NATURE_HALF_W = 5.00     # 1.5-column
+scifig.NATURE_DOUBLE_W = 7.20   # double / full page
+scifig.nature_figsize(columns="single"|"half"|"double", aspect=0.75)
+
+scifig.nature_single_style(font_size=6.0, axes_linewidth=0.8)  # 3.50in, ~5-6pt
+scifig.nature_double_style(font_size=7.0, axes_linewidth=1.0)  # 7.20in, ~7pt
 ```
 
 ### apply_publication_style(style=None)
@@ -83,9 +99,12 @@ Returns `(fig, axes)` with `axes` flattened to 1D (a single `Axes` for 1x1).
 
 ### finalize_figure(fig, out_path, formats=None, dpi=300, close=True, pad=0.05, **kwargs)
 
-Saves to one or more formats. `formats=None` → uses `out_path`'s extension, else
-`['pdf','svg','eps']`. Creates parent dirs. Returns `list[Path]`. Defaults:
-`bbox_inches='tight'`, `pad_inches=pad`, `facecolor='white'`.
+**Vector-first.** Primary output is the vector PDF (editable text, scalable,
+journal-preferred). When `formats=None`: if `out_path` has an extension it uses
+that extension; otherwise **`['pdf']`**. PNG is raster — emit only for screen
+previews by passing `formats=["pdf", "png"]` or `["png"]`. Creates parent
+dirs. Returns `list[Path]`. Defaults: `bbox_inches='tight'`, `pad_inches=pad`,
+`facecolor='white'`.
 
 ### style_axis(ax, ...)
 
@@ -156,9 +175,11 @@ image and hides axes. `labels` adds panel letters. Returns `(fig, axes)`.
 
 Panel letter at the top-left of an axes.
 
-### add_panel_labels(axes, labels=None)
+### add_panel_labels(axes, labels=None, case='upper', bold=True)
 
-Batch version; defaults to `A, B, C, ...`.
+Batch version. ``case='upper'`` → **A, B, C** bold (**Science** convention);
+``case='lower'`` → a, b, c (**Nature** convention). Pass explicit ``labels`` to
+override the auto sequence. ``bold`` toggles the font weight.
 
 ### shared_legend(fig, handles=None, labels=None, location='upper center', ncol=None, **kw)
 
@@ -173,6 +194,100 @@ Inset axes with an optional region indicator. Returns the inset `Axes`.
 Significance/difference brackets (optionally labelled, e.g. `***`).
 
 ---
+
+## Declarative builder (agent-first)
+
+### FigureSpec / render_spec
+
+`spec.py` — describe the figure as a `FigureSpec`; scifig enforces the house
+style, semantic colors, shared legend, panel letters, and polish automatically.
+
+```python
+spec = scifig.FigureSpec(
+    width="double"|"single"|"half"|"full",   # column width (inches)
+    aspect=0.40, ncols=3, panel_case="lower",  # lower=Nature, upper=Science
+    panels=[
+        dict(type="bar", categories=[...], series=[[...]], labels=[...],
+             ours_marker="...", ylabel="...", ylim=(...), annotate=True),
+        dict(type="trend", x=..., ys=[...], labels=[...], ours_marker="...",
+             ylabel="...", xlabel="..."),
+        dict(type="heatmap", matrix=..., cmap="RdBu_r", cbar_label="..."),
+        dict(type="scatter", x=..., y=..., size=..., alpha=...),
+        dict(type="sphere"),
+    ],
+)
+fig, axes = scifig.render_spec(spec, "out/fig", formats=["pdf", "png"], dpi=600)
+```
+
+Per-panel keys: `type`, `labels`, `colors`/`roles`/`ours_marker` (semantic),
+`xlabel`/`ylabel`/`title`, `grid`/`minor`/`raw` (polish control), plus type
+specific keys listed in `spec.py`. `render_spec` auto-applies `finish_axes` to
+each panel (unless `raw=True`).
+
+## Archetypes (callable templates)
+
+`archetypes.py` — complete, styled figures for one shape each. All return
+`(fig, ax)`; use `scifig.save(fig, name)` for a vector PDF.
+
+| Archetype | Shape |
+|-----------|-------|
+| `timeseries_ci(t, y_obs, y_hat, lo, hi)` | time series / fit with CI band |
+| `sorted_bar(names, values)` | ranked horizontal bar |
+| `grouped_bar(group_labels, metrics)` | multi-series comparison bar |
+| `scatter_fit(x, y, degree)` | scatter + polynomial fit + 95% CI |
+| `heatmap(matrix, ...)` | annotated heatmap |
+| `tornado(params, low, high, base)` | one-at-a-time sensitivity |
+| `confusion(cm, labels)` | confusion matrix |
+
+## Journal presets
+
+`journals.py` — per-publisher single-column width + base font.
+
+```python
+scifig.journal_style("nature")                # 3.50in, 7pt
+scifig.journal_figsize("science")             # (2.24, 1.66)
+scifig.fig_size_mm(89, aspect=0.618)           # generic mm->in
+scifig.JOURNAL_SPEC                            # nature/science/cell/ieee/pnas/acs/rsc/elsevier/aps
+```
+
+## Semantic colors
+
+`semantics.py` — assign colors by role, so blue=ours, green=improvement,
+red=baseline hold everywhere without hardcoding hex.
+
+```python
+scifig.assign_colors(labels, ours_marker="Our method")
+scifig.role_color("ours")
+scifig.SEMANTIC_ROLES
+```
+
+## Colorblind-safe palettes
+
+`palette.py` — `scifig.FRIENDLY_PALS`, `scifig.friendly_pal("wong_eight", 4)`
+(Okabe-Ito / Tol / Wong / IBM / Tableau-derived).
+
+## Polish (the "human effort" layer)
+
+`polish.py` — applied to every figure for a journal-grade look.
+
+```python
+scifig.finish_axes(ax, ticks=5, minor=True, grid=True)  # readable/minor ticks, subtle grid
+scifig.finish_figure(fig)                                # layout finish
+scifig.bar_value_labels(ax, bars)                        # well-offset value labels
+scifig.ticks_readable(ax, n=5)                           # deliberate tick count
+scifig.tight_ylim(ax, pad=0.06, floor=0, ceiling=1.0)    # emphasize the relevant band
+scifig.add_minor_ticks(ax) / scifig.soft_grid(ax)
+```
+
+`make_grouped_bar` adds a thin dark edge to every bar automatically. `render_spec`
+runs `finish_axes` per panel by default.
+
+## Quality gate
+
+`quality.py` — `scifig.check_figure(fig, axes)` returns a `QualityReport` with
+FAIL/OK items (axis labels, vector-safety) and prints the four judgment axes
+(Depth · Elegance · Unimpeachable · Visible gap) to answer by hand. Must have no
+FAIL before a figure is done.
 
 ## Validation and conventions
 

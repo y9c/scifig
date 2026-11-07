@@ -1,36 +1,38 @@
 # scifig
 
-**发表级科研图**：matplotlib 封装 + 你偏好的两套样式 + **纯 Python 拼接/标注**多面板图。
+**Publication-grade scientific figures**: a thin matplotlib harness with your two
+preferred styles and **pure-Python panel composition + annotation**.
 
-> 论文图用 `apply_publication_style`，汇报/幻灯片用 `apply_modern_style`。样式全交给
-> 包，代码只写数据。拼图、加 panel 字母、shared legend、inset、显著性 bracket 全部
-> 在 Python 里完成，不用 Illustrator。
+> Use `apply_publication_style` for paper figures, `apply_modern_style` for
+> slides/reports. The style lives entirely in the package; your code writes only
+> data. Combining panels, adding panel letters, shared legends, insets, and
+> significance brackets all happen in Python — no Illustrator.
 
-## 目录
+## Layout
 
 ```
-scifig/          Python 包（样式 + 图型 helpers + compose/annotate）
+scifig/          Python package (styles + plot helpers + compose/annotate)
   style.py       apply_publication_style / apply_modern_style / create_subplots / finalize_figure
   palette.py     PALETTE / DEFAULT_COLORS / MODERN_COLORS / COLORBLIND_SAFE
   helpers.py     make_grouped_bar / make_trend / make_heatmap / make_scatter / make_sphere_illustration
   compose.py     panel_grid / join_figures / add_panel_label / shared_legend / add_inset / add_sig
-  assets/        scientific_publication.mplstyle + modern.mplstyle（随包分发，无需手写路径）
-skill/           Agent skill（SKILL.md + references/ + demos/）
-examples/        可运行示例脚本
+  assets/        scientific_publication.mplstyle + modern.mplstyle (bundled; no hard-coded paths)
+skill/           Agent skill (SKILL.md + references/ + demos/)
+examples/        runnable example scripts
 ```
 
-## 安装
+## Install
 
 ```bash
 pip install -e .
-# 或直接：pip install -r requirements.txt
+# or: pip install -r requirements.txt
 ```
 
-## 快速开始
+## Quick start
 
 ```python
 import matplotlib
-matplotlib.use("Agg")          # 无头/批处理
+matplotlib.use("Agg")          # headless / batch
 import scifig
 
 scifig.apply_publication_style(scifig.FigureStyle(font_size=18))
@@ -39,53 +41,69 @@ scifig.make_grouped_bar(
     ax, ["A", "B", "C"], [[0.9, 0.8, 0.7], [0.7, 0.6, 0.5]],
     ["Ours", "Baseline"], ylabel="Score", annotate=True,
 )
-scifig.finalize_figure(fig, "out/fig", formats=["png", "pdf"], dpi=300)
+scifig.finalize_figure(fig, "out/fig")   # -> out/fig.pdf (vector-first)
 ```
 
-纯写法：直接 `plt.style.use(...scifig/assets/scientific_publication.mplstyle)` 即可，
-无需 import 包。
+Or by path only: `plt.style.use(...scifig/assets/scientific_publication.mplstyle)`
+without importing the package.
 
-## 纯 Python 拼图 + 标注
+## Pure-Python compose + annotate
 
 ```python
 import scifig
 
-# 把已保存的两张 PNG 拼成一张 1x2，并加上 A/B 面板字母
-fig, axes = scifig.join_figures(["a.png", "b.png"], labels=["A", "B"])
-scifig.finalize_figure(fig, "out/combo", formats=["png", "pdf"])
+# Stitch two saved PDF/PNG panels into one 1x2 figure, add lowercase letters (Nature)
+fig, axes = scifig.join_figures(["a.pdf", "b.pdf"], labels=["a", "b"])
+scifig.finalize_figure(fig, "out/combo")   # vector PDF by default
 
-# 或者在同一 figure 里建 grid、加 shared legend、加显著性 bracket
+# Or build a grid in one figure, share the legend, add a significance bracket
 fig, axes = scifig.panel_grid(1, 2)
 scifig.make_trend(axes[0], epochs, [acc_a, acc_b], ["Model A", "Model B"])
 scifig.add_sig(axes[0], 0, 1, y=0.95, marker="***")
 scifig.shared_legend(fig, location="upper center")
 ```
 
-看 **`examples/`** 完整可跑示例（`examples/grouped_bar.py`、`examples/trends_grid.py`、
-`examples/heatmap.py`、`examples/compose_annotate.py`）。
+## Nature / Science conventions
 
-## 用 Agent skill
+- **Nature**: panel letters are **lowercase** `a, b, c`
+  (`add_panel_labels(case="lower")`); body text **Arial 5-6pt**; column widths
+  single 3.50in, half 5.00in, double/full 7.20in.
+- **Science**: panel letters are **uppercase bold** **A, B, C** (default
+  `case="upper"`).
+- **Vector-first**: `finalize_figure` emits the **vector PDF** by default
+  (editable text, infinitely scalable); PNG is raster — only for screen previews.
 
-`skill/` 是本仓库使用的 agent skill。在你的 agent 里引用：
-- 按路径引用 `skill/SKILL.md`（以及按需的 references/api.md、design-theory.md、cookbook.md）。
-- 或软链：`ln -s "$(pwd)/skill" ~/.agents/skills/scifig`，之后可按 name 调用。
+```python
+import scifig
+scifig.apply_publication_style(scifig.nature_single_style(font_size=6.0))  # Arial 6pt, thin spines
+fig, ax = scifig.create_subplots(1, 1, figsize=scifig.nature_figsize("single"))  # 3.5in wide
+scifig.finalize_figure(fig, "out/panel")   # -> out/panel.pdf
+```
 
-核心约定都写在 `skill/references/`；demos 里是真实顶会论文图脚本（house style 范例）。
+See **`examples/`** for runnable scripts (`grouped_bar.py`, `trends_grid.py`,
+`heatmap.py`, `compose_annotate.py`, `full_multipanel.py`).
 
-## 样式 / 色板
+## Agent skill
 
-| 名称 | 用途 | 入口 |
-|------|------|------|
-| `scientific_publication` | 论文发表（大字号、spines 只留左右、600dpi 导出） | `apply_publication_style()` |
-| `modern` | 汇报/网页 | `apply_modern_style()` |
-| `PALETTE` | 语义色（蓝=方法、绿=改进、红=基线、中性=背景） | `scifig.PALETTE` |
+`skill/` is the agent skill for this repo. Reference it by path
+(`skill/SKILL.md`, plus `references/api.md`, `design-theory.md`, `cookbook.md`
+as needed), or symlink it: `ln -s "$(pwd)/skill" ~/.agents/skills/scifig`.
 
-## 许可（重要）
+## Styles / palettes
 
-- **MIT**：本仓库的 `scifig/` 包与 `examples/`。
-- **CC BY-NC 4.0（非商用）**：`skill/demos/figure_*` 与 `skill/references/` 方法论，
-  源自 [figures4papers](https://github.com/ChenLiu-1996/figures4papers)（作者 Chen Liu，
-  Yale）。**上游 LICENSE 实为 CC BY-NC 4.0，不是 MIT** —— 已在本仓库 LICENSE / NOTICE.md
-  更正。商用前请核对。
+| Name | Use | Entry point |
+|------|-----|-------------|
+| `scientific_publication` | paper figures (Arial, thin spines, vector) | `apply_publication_style()` |
+| `modern` | slides / web | `apply_modern_style()` |
+| `PALETTE` | semantic colors (blue=method, green=improvement, red=baseline, neutral=background) | `scifig.PALETTE` |
 
-详见 `LICENSE` 与 `NOTICE.md`。
+## License (important)
+
+- **MIT**: this repo's `scifig/` package and `examples/`.
+- **CC BY-NC 4.0 (non-commercial)**: `skill/demos/figure_*` and the
+  `skill/references/` methodology, from
+  [figures4papers](https://github.com/ChenLiu-1996/figures4papers) (author
+  **Chen Liu**, Yale). The upstream LICENSE is **CC BY-NC 4.0, not MIT** —
+  corrected in this repo's LICENSE / NOTICE.md. Check before commercial use.
+
+See `LICENSE` and `NOTICE.md`.

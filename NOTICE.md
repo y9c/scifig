@@ -17,7 +17,7 @@ This repository mixes two licensed sources. Read carefully before redistributing
 - `skill/references/*` (methodology text: design-theory, common-patterns,
   tutorials, api, demos) also derive from that repo's `scientific-figure-making/`.
 
-> **Correction to the earlier summary:** the original plan and the old `NOTICE.md`
+> **Correction to the earlier summary**: the original plan and the old NOTICE.md
 > called figures4papers "MIT". The repo's actual `LICENSE` file is
 > **CC BY-NC 4.0 (Attribution-NonCommercial 4.0 International)**. This project's
 > `LICENSE`/`NOTICE` reflect that corrected fact. Before any **commercial** use of

@@ -60,6 +60,11 @@ def make_grouped_bar(
     if len(s) != len(labels):
         raise ValueError("len(series) must equal len(labels)")
     colors = list(colors) if colors is not None else list(DEFAULT_COLORS)
+    # deliberate edge stroke: separates bars cleanly in print (the "human" touch)
+    edgecolor = bar_kw.pop("edgecolor", "black")
+    elw = bar_kw.pop("linewidth", None)
+    if elw is None:
+        elw = 0.5
 
     n_group = len(s)
     total = 1.0
@@ -74,6 +79,8 @@ def make_grouped_bar(
             width=width,
             label=lab,
             color=colors[gi % len(colors)],
+            edgecolor=edgecolor,
+            linewidth=elw,
             **bar_kw,
         )
         last = bars
@@ -86,8 +93,14 @@ def make_grouped_bar(
     return last
 
 
-def annotate_bars(ax, bars, fmt="{:.2f}", fontsize=10, padding=3):
-    """Add text above each bar in a ``BarContainer``."""
+def annotate_bars(ax, bars, fmt="{:.2f}", fontsize=None, padding=3):
+    """Add text above each bar in a ``BarContainer``.
+
+    ``fontsize`` defaults to the current base font size
+    (``rcParams['font.size']``) so annotations stay proportionate at any scale.
+    """
+    if fontsize is None:
+        fontsize = plt.rcParams.get("font.size", 10)
     for rect in bars:
         h = rect.get_height()
         if h is None or np.isnan(h):
