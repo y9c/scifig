@@ -6,9 +6,12 @@ thin spines, no grid, Nature-style lower-case letters, vector PDF.
 """
 import matplotlib
 matplotlib.use("Agg")
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # examples/
 import numpy as np
 import scifig
-from bio.diff_exp.data import build
+from diff_exp.data import build
+from biofigs import volcano, ma_plot
 
 d = build()
 
@@ -16,10 +19,10 @@ scifig.apply_publication_style(scifig.FigureStyle(font_size=6.5, axes_linewidth=
 fig, axes = scifig.panel_grid(1, 2, figsize=scifig.nature_figsize("double", aspect=0.42),
                              legend=None)
 
-scifig.volcano(axes[0], d["log2fc"], d["pval"], gene_names=d["gene"],
-               fc_thresh=1.0, p_thresh=0.05, label_top=6)
-scifig.ma_plot(axes[1], d["mean_expr"], d["log2fc"], d["pval"],
-               fc_thresh=1.0, p_thresh=0.05)
+volcano(axes[0], d["log2fc"], d["pval"], gene_names=d["gene"],
+        fc_thresh=1.0, p_thresh=0.05, label_top=6)
+ma_plot(axes[1], d["mean_expr"], d["log2fc"], d["pval"],
+        fc_thresh=1.0, p_thresh=0.05)
 
 scifig.add_panel_labels(axes, case="lower")
 scifig.finish_axes(axes[0], grid=False)

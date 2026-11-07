@@ -11,27 +11,16 @@ or use the built-in ``demo_structure``.
 """
 import matplotlib
 matplotlib.use("Agg")
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import scifig
+from proteinfig import matplotlib_cartoon
 
 scifig.apply_publication_style(scifig.FigureStyle(font_size=6.5, axes_linewidth=0.8))
 fig, ax = scifig.create_subplots(1, 1, figsize=scifig.nature_figsize("double", aspect=0.5))
 
-# Use a real PDB if Biotite is available, else the deterministic demo.
-coords = scifig.fetch_structure("1CRN")  # crambin (small, well-known)
-if coords is None:
-    coords = scifig.demo_structure()
-    sse = "h" * 240 + "e" * 80
-else:
-    sse = None  # Biotite symbols; draw_topology accepts a struct array
-
-scifig.draw_topology(ax, coords, sse=sse, color=scifig.PALETTE["blue_main"])
-
-# annotate a couple of secondary-structure elements
-if coords.shape[0] >= 300:
-    ax.annotate("α-helix", xy=(1.2, 8.0), xytext=(2.0, 6.3),
-                fontsize=6, color="0.3", arrowprops=dict(arrowstyle="->", lw=0.6))
-    ax.annotate("β-sheet", xy=(17.0, 10.6), xytext=(13.5, 12.4),
-                fontsize=6, color="0.3", arrowprops=dict(arrowstyle="->", lw=0.6))
+# vector cartoon from a real PDB (Biotite), else demo fallback
+matplotlib_cartoon(ax, "1CRN", color=scifig.PALETTE["blue_main"])
 
 ax.set_title("Protein topology (vector)", pad=4)
 scifig.finalize_figure(fig, "out/showcase_protein", formats=["pdf", "png"], dpi=600)

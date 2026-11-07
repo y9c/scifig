@@ -28,10 +28,10 @@ highlight, the exact DE thresholds, and whether points are colored by category.
 
 | folder | data | figure | key helpers |
 |--------|------|--------|-------------|
-| `bio/diff_exp/` | `data.py` → log2FC/pval/mean | volcano + MA | `scifig.volcano`, `scifig.ma_plot` |
-| `bio/single_cell/` | `data.py` → UMAP/clusters/expression | UMAP + dot + violin | `scifig.umap_scatter`, `scifig.dot_plot`, `scifig.violin_groups` |
-| `bio/rna_seq/` | `data.py` → QC metrics + counts | QC + expression bars | `scifig.make_grouped_bar` (+`yerr`) |
-| protein | `scifig.demo_structure()` / PDB via `fetch_structure` | 2D ribbon topology | `scifig.draw_topology`, `scifig.ribbon_trace` |
+| `examples/diff_exp/` | `data.py` → log2FC/pval/mean | volcano + MA | `biofigs.volcano`, `biofigs.ma_plot` |
+| `examples/single_cell/` | `data.py` → UMAP/clusters/expression | UMAP + dot + violin | `biofigs.umap_scatter`, `biofigs.dot_plot`, `biofigs.violin_groups` |
+| `examples/rna_seq/` | `data.py` → QC metrics + counts | QC + expression bars | `scifig.make_grouped_bar` (+`yerr`) |
+| protein | `proteinfig.matplotlib_cartoon` (vector) or `proteinfig.pymol_cartoon` (raster) | `proteinfig.*` |
 
 ## Hard rules
 

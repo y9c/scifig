@@ -2,9 +2,12 @@
 """Single-cell figure: UMAP embedding + marker dot plot + per-cluster violin."""
 import matplotlib
 matplotlib.use("Agg")
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # examples/
 import numpy as np
 import scifig
-from bio.single_cell.data import build
+from single_cell.data import build
+from biofigs import umap_scatter, dot_plot, violin_groups
 
 d = build()
 
@@ -13,17 +16,17 @@ fig, axes = scifig.panel_grid(1, 3, figsize=scifig.nature_figsize("double", aspe
                              legend=None)
 
 # a) UMAP embedding coloured by cluster
-scifig.umap_scatter(axes[0], d["umap"][:, 0], d["umap"][:, 1], d["labels"],
+umap_scatter(axes[0], d["umap"][:, 0], d["umap"][:, 1], d["labels"],
                     palette="tol_bright", size=10)
 axes[0].set_title("UMAP")
 
 # b) marker dot plot (colour = mean expression, size = % expressed)
-scifig.dot_plot(axes[1], d["mean_by_cluster"], d["markers"], d["clusters"],
+dot_plot(axes[1], d["mean_by_cluster"], d["markers"], d["clusters"],
                 pct=d["pct_by_cluster"], cmap="viridis")
 axes[1].set_title("Marker expression")
 
 # c) per-cluster violin of a single marker (CD3D, row 0)
-scifig.violin_groups(axes[2], d["expr"][0], d["labels"], order=d["clusters"],
+violin_groups(axes[2], d["expr"][0], d["labels"], order=d["clusters"],
                      ylabel="CD3D expression")
 axes[2].set_title("CD3D")
 

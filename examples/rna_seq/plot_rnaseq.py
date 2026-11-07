@@ -2,9 +2,11 @@
 """RNA-seq QC + gene-expression figure (2 panels)."""
 import matplotlib
 matplotlib.use("Agg")
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # examples/
 import numpy as np
 import scifig
-from bio.rna_seq.data import build
+from rna_seq.data import build
 
 d = build()
 

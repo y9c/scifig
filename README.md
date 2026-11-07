@@ -33,22 +33,27 @@ scifig.finalize_figure(fig, "out/fig")   # -> out/fig.pdf (vector)
 |-----|-----|---------|
 | **Declarative** | most figures | `scifig.FigureSpec(panels=[...])` + `render_spec` |
 | **Object-oriented** | typed panels | `scifig.Figure()` + `add(BarPanel(...))` |
-| **Archetype** | one shape, one call | `scifig.volcano(...)`, `scifig.timeseries_ci(...)` |
+| **Archetype** | one common shape, one call | `scifig.timeseries_ci(...)`, `scifig.sorted_bar(...)` |
 
-## Bioinformatics
+## Bioinformatics (recipes, not package features)
 
-Domain helpers: `volcano`, `ma_plot`, `dot_plot`, `umap_scatter`, `violin_groups`.
-For protein structures, use **`scifig.pymol_cartoon(pdb_id, out)`** to render a
-publication-grade cartoon (real PyMOL engine — white background,
-secondary-structure colored helices/sheets). See `docs/protein-rendering.md`:
-PyMOL output is **raster** PNG; for a true **vector** cartoon use
-`draw_topology`/`ribbon_3d` (pure matplotlib) or cellscape / FlatProt (SVG).
+Domain figures are **examples** in `examples/`, built from scifig primitives —
+the agent reads and adapts them. Two shared recipe modules:
+
+* `examples/biofigs.py` — `volcano`, `ma_plot`, `dot_plot`, `umap_scatter`,
+  `violin_groups`
+* `examples/proteinfig.py` — `pymol_cartoon` (PyMOL, publication PNG) and
+  `matplotlib_cartoon` (vector PDF/SVG via real PDB coordinates + SSE)
+
+See `docs/protein-rendering.md`: PyMOL output is **raster**; for a true vector
+cartoon use the matplotlib recipe (or cellscape / FlatProt SVG).
 
 ```python
-scifig.pymol_cartoon("5JJ4", "out/aicda.png", chain="A")  # publication PNG
+from proteinfig import pymol_cartoon
+pymol_cartoon("5JJ4", "out/aicda.png", chain="A")   # needs brew install pymol
 ```
 
-Runnable demos in `bio/diff_exp`, `bio/single_cell`, `bio/rna_seq`.
+Runnable demos in `examples/diff_exp`, `examples/single_cell`, `examples/rna_seq`.
 
 ## Conventions baked in
 

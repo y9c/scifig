@@ -8,8 +8,12 @@ rasterised, unlike inserting a PyMOL PNG.
 """
 import matplotlib
 matplotlib.use("Agg")
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import scifig
+from biofigs import volcano
+from proteinfig import matplotlib_cartoon
 
 rng = np.random.default_rng(1)
 log2fc = rng.normal(0, 1.1, 1500)
@@ -19,13 +23,11 @@ scifig.apply_publication_style(scifig.FigureStyle(font_size=6.5, axes_linewidth=
 fig, ax = scifig.create_subplots(1, 1, figsize=scifig.nature_figsize("double", aspect=0.52))
 
 # main panel: volcano
-scifig.volcano(ax, log2fc, pval, fc_thresh=1.0, p_thresh=0.05)
+volcano(ax, log2fc, pval, fc_thresh=1.0, p_thresh=0.05)
 
 # inset: vector protein cartoon (top-left), proves vector insertion
 ax_in = scifig.add_inset(ax, "upper left", size="28%")
-coords = scifig.demo_structure()
-sse = "h" * 240 + "e" * 80
-scifig.draw_topology(ax_in, coords, sse=sse, color=scifig.PALETTE["blue_main"])
+matplotlib_cartoon(ax_in, "1CRN")
 ax_in.set_xticks([]); ax_in.set_yticks([])
 ax_in.set_xlabel(""); ax_in.set_ylabel("")
 

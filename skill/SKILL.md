@@ -10,8 +10,14 @@ description: >-
 
 # scifig — publication-grade matplotlib figures
 
-Style lives in the package; your code writes only data. The agent describes the
-figure; scifig enforces style, colors, polish, layout.
+scifig is a **platform + standards + universal interface + capability spec**
+for an agent to make publication figures, **not** a library that implements
+every plot type. It guarantees the *look and conventions*; the agent supplies
+the *figure logic* by reading the capability spec and the recipes in
+`examples/`. Style lives in the platform; your code writes only data.
+
+> **Read `references/capability-spec.md` first** — it maps what scifig provides
+> (built-in) versus what's a recipe to read & adapt, plus the universal rules.
 
 ## Ask before you draw (mandatory)
 
@@ -62,9 +68,11 @@ or an archetype (one call: `volcano`, `timeseries_ci`, `sorted_bar`, ...).
 
 | File | Open when |
 |------|-----------|
-| [references/figure-guidelines.md](references/figure-guidelines.md) | **FIRST** — contract: ask-first, decision ladder, polish, template |
+| [references/capability-spec.md](references/capability-spec.md) | **FIRST** — what scifig provides, the capability map (built-in vs recipe), universal rules |
+| [references/figure-guidelines.md](references/figure-guidelines.md) | agent contract: ask-first, decision ladder, polish, template |
 | [references/templates.md](references/templates.md) | learn-by-example: universal rules + figure-type templates |
 | [references/api.md](references/api.md) | exact function signatures |
+| [../examples/](../../examples/) | runnable recipes to read & adapt |
 
 ## License
 

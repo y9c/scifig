@@ -1,46 +1,16 @@
 #!/usr/bin/env python3
-"""Render AID (AICDA) as a clean, publication-grade PyMOL cartoon.
+"""Render AID (AICDA) as a publication-grade PyMOL cartoon.
 
-Single chain (chain A), white background, secondary-structure colouring, proper
-lighting, high-res ray trace. This is the look expected in top journals — not a
-multi-chain jumble.
+Uses the recipe in ``proteinfig.pymol_cartoon`` (PyMOL via ``brew install pymol``).
+Single chain A, white background, secondary-structure coloring, ray-traced.
+
+Run with the python that has PyMOL, e.g.:
+    /opt/homebrew/bin/python3 examples/pymol_render_aicda.py
 """
-import pymol
-from pymol import cmd
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from proteinfig import pymol_cartoon
 
-cmd.reinitialize()
-cmd.load("data_5JJ4.pdb", "aicda")
-
-cmd.remove("solvent")
-cmd.remove("not polymer")
-
-# isolate one chain (AID domain; A is a good representative), del the rest
-cmd.select("one", "chain A")
-cmd.remove("not one")
-cmd.delete("one")
-
-cmd.hide("everything")
-cmd.show("cartoon", "polymer")
-cmd.set("cartoon_fancy_helices", 1)
-cmd.set("cartoon_smooth_loops", 1)
-cmd.set("cartoon_side_chain_helper", 1)
-
-# secondary-structure colouring: helix blue, sheet red-orange, loop white/grey
-cmd.color("white", "polymer")
-cmd.color("marine", "ss H")   # alpha-helix
-cmd.color("orange", "ss S")   # beta-sheet
-
-cmd.bg_color("white")
-cmd.set("ray_opaque_background", 1)   # <- white background survives ray tracing
-cmd.set("ray_trace_mode", 1)
-cmd.set("ray_shadows", 0)             # cleaner, flat lighting for print
-cmd.set("antialias", 2)
-cmd.set("ambient", 0.5)
-cmd.set("specular", 0.2)
-
-cmd.orient()
-cmd.zoom("polymer", 2.0)
-
-cmd.ray(2200, 1800)
-cmd.png("out/aicda_pymol.png", dpi=300)
-print("wrote out/aicda_pymol.png (single chain, white bg, secondary-structure colors)")
+out = os.path.join("out", "aicda_pymol.png")
+pymol_cartoon("5JJ4", out, chain="A")
+print(f"wrote {out} (single chain A, white bg, SSE colors)")
