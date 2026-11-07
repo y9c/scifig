@@ -27,3 +27,6 @@ figures/
 
 # Original packaged skill zip (contents already unzipped into skill/ and scifig/)
 scientific-figures-skill.zip
+
+# Fetched PDB files (regenerable)
+data_*.pdb

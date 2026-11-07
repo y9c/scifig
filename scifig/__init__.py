@@ -67,10 +67,12 @@ from .polish import (
 )
 from .protein import (
     demo_structure,
+    draw_protein_from_pdb,
     draw_topology,
     fetch_structure,
     load_structure,
-    ribbon_trace,
+    pymol_cartoon,
+    ribbon_3d,
 )
 from .quality import QUALITY_AXES, QualityReport, check_figure
 from .semantics import ROLE_CYCLE, SEMANTIC_ROLES, assign_colors, role_color
@@ -185,8 +187,10 @@ __all__ = [
     "SIGNIFICANT_SCHEME",
     "demo_structure",
     "draw_topology",
+    "draw_protein_from_pdb",
     "fetch_structure",
     "load_structure",
-    "ribbon_trace",
+    "pymol_cartoon",
+    "ribbon_3d",
     "__version__",
 ]
