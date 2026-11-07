@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 yec
+Copyright (c) 2026 Chang Ye
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,18 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-NOTE: The MIT license above applies ONLY to the `scifig/` package and
-`examples/` in this repository (authored here). It does NOT apply to:
-
-* `skill/demos/figure_*` — vendored scripts from figures4papers
-  (https://github.com/ChenLiu-1996/figures4papers), author **Chen Liu** (Yale),
-  licensed **CC BY-NC 4.0** (Attribution-NonCommercial 4.0 International).
-* text in `skill/references/` derived from that repo's `scientific-figure-making`
-  (methodology/design-theory/common-patterns/tutorials), also CC BY-NC 4.0.
-
-See `NOTICE.md` for full attribution. `skill/demos/figure_*` scripts remain under
-their upstream CC BY-NC terms; the figures they produce are for academic reference
-only unless you have explicit permission for commercial use.

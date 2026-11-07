@@ -91,6 +91,5 @@ fig.savefig("out/multi")
 
 - [figure-guidelines.md](figure-guidelines.md) — the agent-first generation contract
 - [api.md](api.md) — exact signatures
-- [design-theory.md](design-theory.md) — why the rules exist
-- [demos/](../demos/) — real published figures to imitate
-- [python code](../examples/spec_benchmark.py) & [OO example](../examples/oo_figure.py) — runnable
+- [examples](../../examples/) — runnable reference figures
+- [bio/](../../bio/) — bioinformatics demos

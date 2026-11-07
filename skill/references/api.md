@@ -1,8 +1,6 @@
 # scifig API Reference
 
-This is the reference for the `scifig` package in this repository. It implements the
-conventions once specified abstractly (figures4papers methodology) as a small,
-importable harness. Import all public symbols from the top-level package:
+Reference for the `scifig` package. Import public symbols from the top level:
 
 ```python
 import scifig
@@ -302,8 +300,6 @@ FAIL before a figure is done.
 ## Related files
 
 - [SKILL.md](../SKILL.md) — when to use this skill
-- [cookbook.md](cookbook.md) — min-code recipes
-- [design-theory.md](design-theory.md) — why the style is chosen
-- [common-patterns.md](common-patterns.md) — layout & print-safe patterns
-- [demos.md](demos.md) — canonical figures4papers scripts (this repo `demos/`)
-- [tutorials.md](tutorials.md) — end-to-end walks
+- [figure-guidelines.md](figure-guidelines.md) — agent contract (ask-first)
+- [templates.md](templates.md) — figure-type templates
+- [README.md](../../README.md) — quick start

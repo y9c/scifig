@@ -2,7 +2,7 @@
 
 Provides the two style systems the project supports:
 
-* ``apply_publication_style`` -- figures4papers house style (spines off, larger
+* ``apply_publication_style`` -- publication house style (spines off, larger
   fonts, frameless legends). Use for paper figures.
 * ``apply_modern_style`` -- clean modern style (subtle grid, sans-serif.
   Use for slides/reports.
@@ -54,7 +54,7 @@ def _asset(name: str) -> Path:
 
 
 # ---------------------------------------------------------------------------
-# Publication style (figures4papers house)
+# Publication house style
 # ---------------------------------------------------------------------------
 def apply_publication_style(style: Optional[FigureStyle] = None) -> None:
     """Apply the publication-house style to matplotlib rcParams.
@@ -138,7 +138,7 @@ def set_palette(palette: str = "modern") -> None:
     """Set the axes color cycle.
 
     Options: ``'modern'``, ``'colorblind'``, ``'dark'``, ``'pastel'``, or
-    ``'publication'`` (uses the figures4papers house palette).
+    ``'publication'`` (uses the semantic house palette).
     """
     palettes = {
         "publication": [

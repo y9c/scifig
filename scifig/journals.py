@@ -1,7 +1,6 @@
 """Publisher / journal figure specs.
 
-Derived from the publisher author guidelines (as compiled by the Icarus-Figures
-dataset). Each journal defines a single-column figure **width in inches** and a
+Each journal defines a single-column figure **width in inches** and a
 **base font size in points**; ``journal_style`` returns an ``rcParams`` dict
 that sizes a figure correctly for that venue, and ``journal_figsize`` gives the
 in-dimensions ``(width, height)``.

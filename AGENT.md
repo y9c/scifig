@@ -26,6 +26,8 @@ unified house style.
 | `scifig/polish.py` | editorial polish (`finish_axes`, `finish_figure`, `bar_value_labels`, `tight_ylim`) |
 | `scifig/layout.py` | audit + auto-fix panel overlap / excessive whitespace (`audit_layout`, `fix_layout`) |
 | `scifig/fonts.py` | font detection + cross-platform Arial fallback |
+| `scifig/bio.py` | bioinformatics: `volcano`, `ma_plot`, `dot_plot`, `umap_scatter`, `violin_groups` |
+| `scifig/protein.py` | pure-matplotlib 2-D protein topology (`draw_topology`, `ribbon_trace`) |
 | `scifig/mcp_server.py` | optional MCP adapter (thin; needs the `mcp` SDK / Python >=3.10) |
 
 ## How an agent should drive scifig
@@ -89,10 +91,9 @@ unified house style.
 
 ## Licensing
 
-- **MIT**: `scifig/` package and `examples/`.
-- **CC BY-NC 4.0**: `skill/demos/figure_*` + `skill/references` methodology text
-  (from figures4papers). See `LICENSE` and `NOTICE.md`; don't move those files
-  under the MIT clause. Before commercial use, review.
+- **MIT** covers the whole repo (`scifig/` package, `examples/`, `bio/`, `skill/`).
+- See `LICENSE`. Make sure vendored/bundled assets carry their own licences if
+  added later.
 
 ## Publish checklist for GitHub
 
@@ -105,8 +106,8 @@ unified house style.
    produce a vector PDF), and a dry wheel build (`uv build`).
 5. Confirm `requirements.txt` is gone (uv.lock + pyproject groups are the source
    of truth). Update `README.md`, `skill/SKILL.md`, `references/api.md`, and
-   `sources.md` if APIs changed.
-6. Commit **all** of: `LICENSE`, `NOTICE.md`, `AGENT.md`, `README.md`,
+   `references/templates.md` if APIs changed.
+6. Commit **all** of: `LICENSE`, `AGENT.md`, `README.md`,
    `pyproject.toml`, `uv.lock`, `Makefile`, `docs/architecture.md`, `scifig/`,
    `skill/`, `examples/`.
 7. Push to your remote: `git remote add origin <url> && git push -u origin main`.

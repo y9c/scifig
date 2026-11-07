@@ -2,7 +2,7 @@
 
 Each function is a complete, publication-styled figure for one common science
 figure shape. An agent picks the matching archetype, passes data, and gets a
-style-consistent figure. This mirrors the Icarus-Figures A1-A13 concept, merged
+style-consistent figure. This is a callable template (one figure shape per function), merged
 with scifig's house style (semantic colors, thin spines, Nature sizing, vector
 PDF via ``finalize_figure``).
 

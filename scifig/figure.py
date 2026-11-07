@@ -4,8 +4,7 @@ The declarative ``FigureSpec`` covers most needs, but some figures want an
 **object-oriented** build: create a canvas, add typed panels (`BarPanel`,
 `TrendPanel`, `HeatmapPanel`, `ScatterPanel`), then `savefig()`. This module
 provides that as an OO front-end over the same engine (so style, semantic
-colors, polish, layout audit, and vector-first save stay identical), absorbing
-the panel-builder pattern from cnsplots' ``multipanel``.
+colors, polish, layout audit, and vector-first save stay identical).
 
 Example::
 

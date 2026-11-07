@@ -1,7 +1,6 @@
 """Mechanical figure quality gate (agent-oriented acceptance check).
 
-Derived from the Icarus-Figures critique model + scientific-figure publication
-guidelines. ``check_figure`` inspects a rendered ``fig``/axes and reports
+A mechanical acceptance check; ``check_figure`` inspects a rendered ``fig``/axes and reports
 FAIL/OK items, so an agent can verify a figure is publication-ready *before*
 declaring it done — not just that it "plotted correctly".
 

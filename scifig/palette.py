@@ -2,7 +2,7 @@
 
 Two families coexist:
 
-* ``PALETTE`` / ``DEFAULT_COLORS`` -- the figures4papers house palette (blue =
+* ``PALETTE`` / ``DEFAULT_COLORS`` -- the semantic house palette (blue =
   proposed method, green = improvement, red = baseline/contrast, neutral =
   background). Used by ``apply_publication_style`` and the ``make_*`` helpers.
 * ``MODERN_COLORS`` / ``COLORBLIND_SAFE`` -- clean categorical palettes for the
@@ -13,7 +13,7 @@ importing matplotlib.
 """
 
 # ---------------------------------------------------------------------------
-# figures4papers-style semantic palette
+# semantic house palette
 # ---------------------------------------------------------------------------
 PALETTE = {
     "blue_main": "#0F4D92",
@@ -69,7 +69,7 @@ COLORBLIND_SAFE = [
 ]
 
 # ---------------------------------------------------------------------------
-# Named colorblind-safe palettes (pypubfigs / Okabe-Ito derived)
+# Named colorblind-safe palettes
 # ---------------------------------------------------------------------------
 # B&W-printable and deuteranopia-safe via distinct luminance; pair with distinct
 # markers/linestyles for full redundancy.
@@ -128,7 +128,7 @@ FRIENDLY_PALS = {
 
 
 def friendly_pal(name: str, n=None) -> list[str]:
-    """Return a named colorblind-safe palette (pypubfigs / Okabe-Ito derived).
+    """Return a named colorblind-safe palette.
 
     ``n`` truncates to the first ``n`` colors; raise if ``n`` exceeds the palette.
     """

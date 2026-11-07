@@ -1,108 +1,71 @@
 ---
 name: scifig
 description: >-
-  Publication-grade matplotlib scientific figures (personalized): wraps your two
-  preferred styles (scientific_publication / modern), plot-type helpers (grouped
-  bars / trend / heatmap / scatter / sphere illustration), and pure-Python
-  compose + annotation helpers (panel_grid, join_figures, shared_legend,
-  add_panel_label, add_inset, add_bracket/add_sig). Use when making formal
-  figures for papers, reports, or slides, or when reusing this repo's house style
-  and the scifig package. Do not use for interactive dashboards (Plotly/Altair/
-  Bokeh), publication-less EDA-only plots, dominant 3D/GIS workflows, or
-  Illustrator/Figma-first infographics. Trigger words: scientific figure,
-  publication figure, matplotlib, grouped bar, heatmap, multi-panel, figures4papers.
+  Publication-grade matplotlib scientific figures, agent-first: declarative spec
+  and object-oriented builders, plot archetypes, semantic colors, editorial
+  polish, and vector export. Use for formal figures in papers/slides/reports or
+  bioinformatics. Not for interactive dashboards, publication-less EDA, or
+  Illustrator-first infographics.
 ---
 
-# scifig — Publication-grade scientific figures (matplotlib)
+# scifig — publication-grade matplotlib figures
 
-This skill is bound to the `scifig` project (this repo). It is a personalized
-integration of: **publication style + modern style + pure-Python compose/annotate**.
-Core philosophy: the style lives entirely in the package; your code writes only data.
+Style lives in the package; your code writes only data. The agent describes the
+figure; scifig enforces style, colors, polish, layout.
 
-## When to use
+## Ask before you draw (mandatory)
 
-- Making formal **paper / slide / report** figures with matplotlib, needing a
-  publication look.
-- Involving **grouped bars, trend lines, heatmaps, multi-panel grids, PDF/SVG/high-DPI** output.
-- Wanting to **combine several panels in pure Python and annotate them** (panel
-  letters, shared legend, inset, significance bracket, stitch saved figures).
+**Ask up to 5 focused questions before writing code.** Never plot on a guess.
 
-## When not to use
+1. **Claim** — the one point this figure must make?
+2. **Venue + width** — journal? single/half/double? (sets font + size + letters)
+3. **Panels** — how many, how arranged, which share axes?
+4. **Data** — the table/array, units, N, grouping, variable of interest?
+5. **Chart type + thresholds** — e.g. volcano `|log2FC|>1`, `padj<0.05`?
 
-- **Plotly / Altair / Bokeh** interactive, web-first.
-- **EDA-only** with no publication target (seaborn/pandas suffice).
-- Dominant **3D, GIS**, or non-matplotlib workflow.
-- **Illustrator / Figma-first** infographics (not matplotlib data plots).
+Rules: infer (don't guess) what's unambiguous; batch questions; state your
+default so the user just confirms; restate the plan in one line before coding.
 
-## Quick start
-
-### A: use the scifig package (recommended)
+## Build a figure
 
 ```python
 import scifig
-
-# Paper figure: publication style + larger type
-scifig.apply_publication_style(scifig.FigureStyle(font_size=18))
-fig, ax = scifig.create_subplots(1, 1)
-scifig.make_grouped_bar(
-    ax, ["A", "B", "C"], [[0.9, 0.8, 0.7], [0.7, 0.6, 0.5]],
-    ["Ours", "Baseline"], ylabel="Score", annotate=True,
+spec = scifig.FigureSpec(
+    width="double", aspect=0.45, ncols=3, panel_case="lower",
+    panels=[
+        dict(type="bar", categories=[...], series=[[...]], labels=["Our method", "Base"],
+             our_marker="Our method", ylabel="Score"),
+        dict(type="trend", x=..., ys=[...], labels=["Our method", "Base"],
+             our_marker="Our method", ylabel="Val acc", xlabel="Epoch"),
+        dict(type="heatmap", matrix=..., cmap="RdBu_r", cbar_label="r"),
+    ],
 )
-scifig.finalize_figure(fig, "out/fig")   # -> out/fig.pdf (vector-first)
+fig, axes = scifig.render_spec(spec, "out/fig")   # -> out/fig.pdf
 ```
 
-Slides/reports: `scifig.apply_modern_style()`.
+Or object-oriented (`Figure` + `BarPanel`/`TrendPanel`/`HeatmapPanel`/`ScatterPanel`)
+or an archetype (one call: `volcano`, `timeseries_ci`, `sorted_bar`, ...).
 
-### B: use only the .mplstyle file
+## House rules
 
-```python
-import matplotlib.pyplot as plt
-plt.style.use("<repo>/scifig/assets/scientific_publication.mplstyle")
-```
+- **Arial ~5-6pt** at final column width; lowercase Nature letters, uppercase bold
+  Science.
+- **Semantic colors**: `assign_colors(labels, ours_marker=...)` — blue=ours,
+  green=improve, red=baseline.
+- **Vector-first**: PDF default; `pdf.fonttype=42`; `savefig.bbox=standard`.
+- **Readable/minor ticks, subtle grid or off**, thin spines, panel letters at
+  the top-left corner.
+- **Reproducible**: read data from a path; no inline data; no AI images.
+- **Run `check_figure`** (no FAIL) and visually confirm before done.
 
-## File map
+## References
 
-> **Agents start here:** read [references/figure-guidelines.md](references/figure-guidelines.md)
-> **first** — it is the agent-first contract: the two mandatory questions, the
-> fixed decision ladder, the polish checklist, hard rules, and the code template.
+| File | Open when |
+|------|-----------|
+| [references/figure-guidelines.md](references/figure-guidelines.md) | **FIRST** — contract: ask-first, decision ladder, polish, template |
+| [references/templates.md](references/templates.md) | learn-by-example: universal rules + figure-type templates |
+| [references/api.md](references/api.md) | exact function signatures |
 
-| File / dir | Open when |
-|-----------|----------|
-| [references/figure-guidelines.md](references/figure-guidelines.md) | **FIRST** — how to build any figure as an agent (contract + template) |
-| [references/templates.md](references/templates.md) | **learn-by-example**: universal rules + per-figure-type templates (bars/trend/heatmap/scatter, OO + dict) |
-| [references/api.md](references/api.md) | all scifig function signatures, PALETTE, FigureStyle, validation |
-| [references/cookbook.md](references/cookbook.md) | **code cheatsheet**: 7 figure types, palette hex, multi-panel/inset/stat annotation, mplstyle reference |
-| [references/tutorials.md](references/tutorials.md) | end-to-end flows (bars / trends / heatmap / multi-panel) |
-| [references/design-theory.md](references/design-theory.md) | layout, export policy, palette rationale |
-| [references/common-patterns.md](references/common-patterns.md) | layout patterns, legend panel, print-safe bars |
-| [references/demos.md](references/demos.md) | real top-venue figure script index (this repo `demos/`) |
-| [demos/](demos/) | 8 reproducible top-venue paper figure scripts (house style) |
-| [examples/](../examples/) | runnable examples in this repo |
+## License
 
-Open `references/` only as needed; don't preload every file. Start from the table
-above, then follow the internal links (and `demos/`, `examples/` scripts).
-
-## Running as a tool / MCP
-
-- **In your repo**: reference this `skill/` and call the engine directly.
-- **Anywhere else**: start the MCP server (`make mcp`, or
-  `pip install "scifig[mcp]" && scifig-mcp`). It exposes `render_spec`,
-  `assign_semantic_colors`, `list_palettes`, `quality_axes` as schema'd tools any
-  MCP-capable client can call. Needs Python >=3.10.
-- **Reproducible env**: `make setup` (uv) + committed `uv.lock`. See
-  [`docs/architecture.md`](../docs/architecture.md) for the 3-layer design.
-
-## License and attribution
-
-- **scifig package + examples**: authored in this repo, MIT.
-- **demos/ + reference methodology**: from
-  [figures4papers](https://github.com/ChenLiu-1996/figures4papers) (author
-  **Chen Liu**, Yale), **CC BY-NC 4.0** (non-commercial; see upstream LICENSE,
-  this repo's LICENSE and NOTICE.md).
-- **assets/*.mplstyle**: derived from the personal `modern-matplotlib` /
-  `scientific_publication` styles.
-
-> Important: figures4papers' LICENSE is actually **CC BY-NC 4.0** (not MIT).
-> This repo's LICENSE (MIT) covers only the `scifig` package and `examples/`;
-> `demos/` and the derived reference text remain under upstream CC BY-NC 4.0.
-> Check before commercial use.
+MIT. See `LICENSE`.
