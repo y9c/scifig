@@ -63,18 +63,20 @@ def load_structure(path: str) -> Optional[np.ndarray]:
 def demo_structure():
     """Return a compact 2-D folded topology as a (N,3) Cα coordinate array.
 
-    A realistic-looking mix of alpha-helices and beta-strands laid out in 2-D,
-    used when Biotite isn't installed so the module always renders a meaningful
-    topology for demos.
+    A recognizable globular mix: four alpha-helices (undulating vertical
+    ribbons) + two parallel beta-strands, used when Biotite isn't installed so
+    the module always renders a meaningful topology for demos.
     """
     xy = []
-    for x0 in (1.0, 6.5, 12.0):  # three helices (rounded), rising
-        x = x0 + 0.9 * np.cos(np.linspace(0, np.pi, 40))
-        y = np.linspace(1.0, 14.0, 40)
+    for x0, amp in ((1.0, 0.55), (5.0, 0.6), (9.0, 0.5), (13.0, 0.62)):
+        y = np.linspace(1.0, 15.0, 60)
+        # real alpha-helix: undulate perpendicular to the rising axis
+        x = x0 + amp * np.sin(np.linspace(0, 4 * np.pi, 60))
         xy.append(np.stack([x, y], axis=1))
-    # two beta strands (arrows) crossing
-    xy.append(np.stack([np.linspace(1.0, 18.0, 30), np.linspace(8.0, 9.5, 30)], axis=1))
-    xy.append(np.stack([np.linspace(18.0, 1.0, 30), np.linspace(11.5, 10.5, 30)], axis=1))
+    # two parallel beta-strands (arrows) near the bottom
+    for y0, dy in ((8.5, 0.0), (10.5, 0.4)):
+        xy.append(np.stack([np.linspace(1.0, 19.0, 40),
+                            np.full(40, y0) + np.linspace(0, dy, 40)], axis=1))
     coords = np.vstack(xy)
     coords = np.hstack([coords, np.zeros((coords.shape[0], 1))])
     return coords
@@ -101,8 +103,11 @@ def ribbon_trace(ax, coords, sse=None, color=PALETTE["blue_main"],
     if coords.ndim != 2 or coords.shape[1] < 2:
         raise ValueError("coords must be (N, 2) or (N, 3)")
     xy = coords[:, :2]
+    # ensure sse is a 1-D array of single characters (np.isin needs a sequence)
     if sse is None:
         sse = np.array(["-"] * len(xy))
+    else:
+        sse = np.asarray(list(sse))
     if len(sse) != len(xy):
         sse = np.array(["-"] * len(xy))
 

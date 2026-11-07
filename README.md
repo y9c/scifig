@@ -38,8 +38,14 @@ scifig.finalize_figure(fig, "out/fig")   # -> out/fig.pdf (vector)
 ## Bioinformatics
 
 Domain helpers: `volcano`, `ma_plot`, `dot_plot`, `umap_scatter`, `violin_groups`,
-and pure-matplotlib protein topology (`draw_topology`). Runnable demos in
-`bio/diff_exp`, `bio/single_cell`, `bio/rna_seq` (each with `data.py` + `plot_*.py`).
+and pure-matplotlib protein topology (`draw_topology`, `ribbon_trace`) — no PyMOL
+needed, so the cartoon is **vector** and can be inserted as a panel/inset of a
+larger figure without rasterising. Runnable demos in `bio/diff_exp`,
+`bio/single_cell`, `bio/rna_seq`; showcase figures in `examples/`
+(`showcase_protein`, `showcase_inset`, `benchmark_parity`, `nature_fullpage`).
+
+On protein rendering: see `docs/protein-rendering.md` — PyMOL outputs a bitmap;
+for vector inserts use cellscape / FlatProt (SVG) or scifig's own cartoon.
 
 ## Conventions baked in
 
