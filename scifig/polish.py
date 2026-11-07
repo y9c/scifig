@@ -12,13 +12,9 @@ compose exactly the level of polish you want.
 
 from __future__ import annotations
 
-from typing import Optional, Sequence
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.ticker import AutoMinorLocator, MaxNLocator
-
-from .helpers import annotate_bars
 
 __all__ = [
     "finish_axes",
@@ -43,8 +39,10 @@ def ticks_readable(ax, n=5, which="y"):
 
 def add_minor_ticks(ax, which="both", size=2.0, width=0.5):
     """Add minor ticks (a refinement that reads "edited")."""
-    for axis in (ax.xaxis if which in ("x", "both") else [],
-                 ax.yaxis if which in ("y", "both") else []):
+    for axis in (
+        ax.xaxis if which in ("x", "both") else [],
+        ax.yaxis if which in ("y", "both") else [],
+    ):
         axis.set_minor_locator(AutoMinorLocator(2))
     ax.tick_params(which="minor", length=size, width=width)
     return ax
@@ -96,14 +94,14 @@ def bar_value_labels(ax, bars=None, fmt="{:.2f}", fontsize=None, padding=3, hide
             (rect.get_x() + rect.get_width() / 2.0, h),
             xytext=(0, padding),
             textcoords="offset points",
-            ha="center", va="bottom",
+            ha="center",
+            va="bottom",
             fontsize=fontsize or plt.rcParams.get("font.size", 8),
         )
     return ax
 
 
-def finish_axes(ax, title=None, xlabel=None, ylabel=None,
-                ticks=5, grid=True, minor=True):
+def finish_axes(ax, title=None, xlabel=None, ylabel=None, ticks=5, grid=True, minor=True):
     """One-call human polish on a single axes.
 
     Sets readable tick density, optional minor ticks, subtle grid behind the

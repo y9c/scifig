@@ -10,13 +10,10 @@ useful for the caller (e.g. the last ``BarContainer`` for annotation).
 
 from __future__ import annotations
 
-from typing import Sequence, Optional
-
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
+import numpy as np
 
-from .palette import DEFAULT_COLORS, PALETTE
+from .palette import DEFAULT_COLORS
 
 __all__ = [
     "make_grouped_bar",
@@ -156,9 +153,7 @@ def make_trend(
         line = ax.plot(x, mean, label=lab, color=c, linestyle=linestyles[i], **plot_kw)
         lines.append(line[0])
         if show_shadow and std is not None:
-            ax.fill_between(
-                x, mean - std, mean + std, color=c, alpha=0.18, linewidth=0
-            )
+            ax.fill_between(x, mean - std, mean + std, color=c, alpha=0.18, linewidth=0)
     if ylabel is not None:
         ax.set_ylabel(ylabel)
     if xlabel is not None:
@@ -247,8 +242,10 @@ def make_sphere_illustration(
     ax.imshow(
         shade,
         extent=[
-            center[0] - radius, center[0] + radius,
-            center[1] - radius, center[1] + radius,
+            center[0] - radius,
+            center[0] + radius,
+            center[1] - radius,
+            center[1] + radius,
         ],
         cmap="bone",
         alpha=alpha,

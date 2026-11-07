@@ -24,17 +24,16 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 import numpy as np
-import matplotlib.pyplot as plt
 
+from .semantics import assign_colors
 from .style import (
+    NATURE_DOUBLE_W,
+    NATURE_HALF_W,
+    NATURE_SINGLE_W,
     FigureStyle,
     apply_publication_style,
     finalize_figure,
-    NATURE_SINGLE_W,
-    NATURE_HALF_W,
-    NATURE_DOUBLE_W,
 )
-from .semantics import assign_colors
 
 __all__ = ["FigureSpec", "render_spec", "COLUMN_WIDTHS"]
 
@@ -67,18 +66,22 @@ class FigureSpec:
     """
 
     panels: list[dict] = field(default_factory=list)
-    width: str = "double"                # single|half|double|full (inches)
-    aspect: float = 0.55                 # height / width
-    font_size: float = 6.0               # base pt (Nature ~5-6)
+    width: str = "double"  # single|half|double|full (inches)
+    aspect: float = 0.55  # height / width
+    font_size: float = 6.0  # base pt (Nature ~5-6)
     axes_linewidth: float = 0.8
-    panel_case: str = "lower"            # lower=Nature, upper=Science
+    panel_case: str = "lower"  # lower=Nature, upper=Science
     shared_legend: bool = True
     legend_ncol: Optional[int] = None
     legend_location: str = "lower center"
     legend_height: float = 0.06
     wspace: float = 0.16
     hspace: float = 0.30
-    ncols: Optional[int] = None          # force grid columns (else sqrt)
+    ncols: Optional[int] = None  # force grid columns (else sqrt)
+    layout: str = "auto"  # auto|constrained|tight|none (overlap fix)
+    sharex: bool = False  # share x across all panels
+    sharey: object = False  # True|'row'|'col'|False — share y across panels
+    share_groups: Optional[list] = None  # [[i,j,...],...] share y within each group
     style: Optional[FigureStyle] = None
 
     def __post_init__(self):
@@ -167,6 +170,7 @@ def render_spec(spec: FigureSpec, out_path: str, formats=None, dpi=600):
         legend="bottom" if spec.shared_legend else None,
         legend_height=spec.legend_height,
         wspace=spec.wspace, hspace=spec.hspace,
+        sharex=spec.sharex, sharey=spec.sharey, share_groups=spec.share_groups,
     )
 
     for i, p in enumerate(spec.panels):
@@ -188,5 +192,15 @@ def render_spec(spec: FigureSpec, out_path: str, formats=None, dpi=600):
         compose.shared_legend(fig, location=spec.legend_location,
                               ncol=spec.legend_ncol or min(n, 3))
 
-    saved = finalize_figure(fig, out_path, formats=formats or ["pdf"], dpi=dpi)
+    # --- layout audit + auto-fix: prevent panel overlap / excessive whitespace ---
+    layout = spec.layout
+    if layout != "none":
+        from .layout import fix_layout
+        report = fix_layout(fig, engine=(layout if layout != "auto" else "constrained"))
+        if report.has_overlap:
+            import warnings
+            warnings.warn(f"scifig: {len(report.overlaps)} panel overlap(s) remained "
+                          f"after {layout} layout; check panel labels/orientation.")
+
+    finalize_figure(fig, out_path, formats=formats or ["pdf"], dpi=dpi)
     return fig, axes

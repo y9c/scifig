@@ -1,26 +1,40 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
 
 [project]
 name = "scifig"
-version = "0.1.0"
-description = "Publication-ready matplotlib figures with your preferred style + pure-Python compose/annotate helpers"
+version = "0.3.0"
+description = "Publication-grade matplotlib scientific figures, agent-first: declarative spec, archetypes, semantic colors, polish, layout audit, quality gate"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 authors = [{ name = "yec" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
-    "matplotlib>=3.5",
-    "numpy>=1.21",
+    "matplotlib>=3.6",
+    "numpy>=1.23",
     "cycler>=0.11",
 ]
 
 [project.optional-dependencies]
-dev = ["scipy>=1.7"]
+# plotting-heavy extras (uncertainty bands use scipy only in examples)
+examples = ["scipy>=1.9"]
+# MCP server: expose scifig as discoverable tools (needs Python >=3.10)
+mcp = ["mcp>=1.0"]
+# development: testing + linting
+dev = ["pytest>=7", "ruff>=0.4"]
 
-[tool.setuptools]
+[project.scripts]
+scifig-mcp = "scifig.mcp_server:run_server"
+
+[tool.hatch.build.targets.wheel]
 packages = ["scifig"]
+artifacts = ["scifig/assets/*.mplstyle"]
 
-[tool.setuptools.package-data]
-scifig = ["assets/*.mplstyle"]
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]

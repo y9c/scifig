@@ -75,6 +75,7 @@ def check_figure(
 
     # 2. vector-safety
     from matplotlib import rcParams
+
     if rcParams.get("pdf.fonttype", 0) != 42:
         r.fail("vector.text", "pdf.fonttype != 42; PDF text will be Type-3 (not editable)")
     else:

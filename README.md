@@ -23,10 +23,24 @@ examples/        runnable example scripts
 
 ## Install
 
+**Recommended (reproducible, cross-machine): `uv`**
+
 ```bash
-pip install -e .
-# or: pip install -r requirements.txt
+make setup          # create .venv (Python 3.11) + install package (dev + examples extras)
+make figs           # regenerate all example figures (vector PDFs)
 ```
+
+Or plain pip:
+
+```bash
+pip install -e .            # engine only
+pip install -e ".[mcp]"     # + MCP server (needs Python >=3.10)
+pip install -e ".[examples]"  # + scipy (examples)
+```
+
+See **`docs/architecture.md`** for the 3-layer design (skill / MCP / engine), the
+reproducible environment, and cross-machine setup. `uv.lock` is committed so any
+machine builds the same environment.
 
 ## Quick start
 

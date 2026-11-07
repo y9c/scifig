@@ -18,10 +18,9 @@ Two groups:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional, Sequence
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.gridspec import GridSpec
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
 
@@ -40,29 +39,75 @@ __all__ = [
 _LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-def panel_grid(nrows=1, ncols=1, figsize=None, legend="bottom", legend_height=0.08, wspace=0.18, hspace=0.30, **kwargs):
+def panel_grid(
+    nrows=1,
+    ncols=1,
+    figsize=None,
+    legend="bottom",
+    legend_height=0.08,
+    wspace=0.18,
+    hspace=0.30,
+    sharex=False,
+    sharey=False,
+    share_groups=None,
+    **kwargs,
+):
     """Create ``(fig, axes)`` for a multi-panel figure with GridSpec spacing.
 
-    ``legend``: ``'bottom'``/``'top'``/``None`` — reserve a horizontal strip on
-    that side for a shared legend (via ``shared_legend``), so the legend never
-    overlaps the data panels. ``legend_height`` is the strip's fraction of the
-    figure height. Returns ``(fig, axes)`` where ``axes`` is a flat 1D array.
+    ``legend``: ``'bottom'``/``'top'``/``None`` — reserve a horizontal strip for
+    a shared legend. ``sharex``/``sharey``: ``True`` shares across all panels;
+    ``'row'``/``'col'`` shares within each row/column. ``share_groups``
+    overrides both: a list of lists of **flat indices** (same order as the
+    returned ``axes``) that share a y-axis, e.g. ``[[0, 1], [2, 3]]``. Returns
+    ``(fig, axes)`` where ``axes`` is a flat 1D array.
     """
     if figsize is None:
         figsize = (3.5 * ncols, 2.625 * nrows)
     fig = plt.figure(figsize=figsize)
-    if legend is None:
-        gs = GridSpec(nrows, ncols, figure=fig, wspace=wspace, hspace=hspace)
-        axes = [fig.add_subplot(gs[i, j]) for i in range(nrows) for j in range(ncols)]
-    else:
-        total_rows = nrows + 1
-        if legend == "bottom":
-            gs = GridSpec(total_rows, ncols, figure=fig, wspace=wspace, hspace=hspace,
-                          height_ratios=[1] * nrows + [legend_height])
-        else:  # "top"
-            gs = GridSpec(total_rows, ncols, figure=fig, wspace=wspace, hspace=hspace,
-                          height_ratios=[legend_height] + [1] * nrows)
-        axes = [fig.add_subplot(gs[i, j]) for i in range(nrows) for j in range(ncols)]
+
+    # flat index -> reference axis index to share y with
+    sy = {}
+    if share_groups is not None:
+        for group in share_groups:
+            for idx in group[1:]:
+                sy[idx] = group[0]
+    elif sharey:
+        if sharey == "row":
+            for r in range(nrows):
+                for c in range(1, ncols):
+                    sy[r * ncols + c] = r * ncols
+        elif sharey == "col":
+            for r in range(1, nrows):
+                for c in range(ncols):
+                    sy[r * ncols + c] = c
+        else:
+            for i in range(1, nrows * ncols):
+                sy[i] = 0
+
+    rates = (
+        ([1] * nrows + [legend_height])
+        if legend == "bottom"
+        else ([legend_height] + [1] * nrows)
+        if legend == "top"
+        else None
+    )
+    gs = GridSpec(
+        (nrows + 1) if legend else nrows,
+        ncols,
+        figure=fig,
+        wspace=wspace,
+        hspace=hspace,
+        height_ratios=rates,
+    )
+    axes = []
+    for i in range(nrows):
+        for j in range(ncols):
+            idx = i * ncols + j
+            share_ax = axes[sy[idx]] if idx in sy and sy[idx] < idx else None
+            ax = fig.add_subplot(gs[i, j], sharey=share_ax)
+            if sharex and idx > 0:
+                ax.sharex(axes[0])
+            axes.append(ax)
     return fig, np.asarray(axes).reshape(-1)
 
 
@@ -118,21 +163,28 @@ def join_figures(files, out_path=None, ncols=None, figsize=None, labels=None, dp
     return fig, axes
 
 
-def add_panel_label(ax, letter=None, x=0.03, y=0.97, fontsize=None, fontweight="bold"):
+def add_panel_label(ax, letter=None, x=-0.12, y=1.02, fontsize=None, fontweight="bold"):
     """Add a panel letter to a single axes (default: uppercase ``A``).
 
-    Defaults to the **top-left, inside the axes** (the common Nature/Science
-    convention) so the letter never collides with y-axis tick labels. Pass
-    ``x``/``y`` to override (e.g. ``x=-0.14, y=1.04`` for an outside-the-axes
-    label). ``fontsize`` defaults to 1.2x the current base font size.
+    Defaults to the **top-left corner, outside the axes**: ``x=-0.12`` sits in
+    the y-axis tick-label zone (aligned with the y tick labels) and ``y=1.02``
+    just above the plot top, at ``va='bottom'``. This is the journal convention
+    (category labels like a/b/c sit at the corner, never inside the plot).
+    Pass ``x``/``y`` to override. ``fontsize`` defaults to 1.2x the base font.
     """
     if letter is None:
         letter = "A"
     if fontsize is None:
         fontsize = 1.2 * plt.rcParams.get("font.size", 10)
     ax.text(
-        x, y, letter, transform=ax.transAxes, fontsize=fontsize,
-        fontweight=fontweight, va="top", ha="left",
+        x,
+        y,
+        letter,
+        transform=ax.transAxes,
+        fontsize=fontsize,
+        fontweight=fontweight,
+        va="bottom",
+        ha="left",
     )
     return ax
 
@@ -155,7 +207,9 @@ def add_panel_labels(axes, labels=None, case="upper", bold=True):
     return axes
 
 
-def shared_legend(fig, handles=None, labels=None, location="upper center", ncol=None, clear=True, **kw):
+def shared_legend(
+    fig, handles=None, labels=None, location="upper center", ncol=None, clear=True, **kw
+):
     """Place one legend on the figure instead of per-panel legends.
 
     ``clear=True`` (default) removes each axes' own legend so the figure has
@@ -164,14 +218,14 @@ def shared_legend(fig, handles=None, labels=None, location="upper center", ncol=
     """
     if handles is None or labels is None:
         # gather from all axes (dedup by label)
-        h, l = [], []
+        h, lb = [], []
         for ax in fig.axes:
             hh, ll = ax.get_legend_handles_labels()
             for a, b in zip(hh, ll):
-                if b not in l:
-                    l.append(b)
+                if b not in lb:
+                    lb.append(b)
                     h.append(a)
-        handles, labels = h, l
+        handles, labels = h, lb
     if clear:
         for ax in fig.axes:
             if ax.get_legend() is not None:
@@ -195,7 +249,9 @@ def add_bracket(ax, x0, x1, y, height=0.03, text=None, fontsize=10):
     """Draw a significance/difference bracket between ``x0`` and ``x1`` at ``y``."""
     ax.plot([x0, x0, x1, x1], [y, y + height, y + height, y], "k-", lw=0.8)
     if text:
-        ax.text((x0 + x1) / 2.0, y + height * 1.05, text, ha="center", va="bottom", fontsize=fontsize)
+        ax.text(
+            (x0 + x1) / 2.0, y + height * 1.05, text, ha="center", va="bottom", fontsize=fontsize
+        )
     return ax
 
 

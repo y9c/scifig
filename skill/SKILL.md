@@ -81,6 +81,16 @@ plt.style.use("<repo>/scifig/assets/scientific_publication.mplstyle")
 Open `references/` only as needed; don't preload every file. Start from the table
 above, then follow the internal links (and `demos/`, `examples/` scripts).
 
+## Running as a tool / MCP
+
+- **In your repo**: reference this `skill/` and call the engine directly.
+- **Anywhere else**: start the MCP server (`make mcp`, or
+  `pip install "scifig[mcp]" && scifig-mcp`). It exposes `render_spec`,
+  `assign_semantic_colors`, `list_palettes`, `quality_axes` as schema'd tools any
+  MCP-capable client can call. Needs Python >=3.10.
+- **Reproducible env**: `make setup` (uv) + committed `uv.lock`. See
+  [`docs/architecture.md`](../docs/architecture.md) for the 3-layer design.
+
 ## License and attribution
 
 - **scifig package + examples**: authored in this repo, MIT.

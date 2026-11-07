@@ -22,6 +22,10 @@ unified house style.
 | `scifig/archetypes.py` | callable figure templates (`timeseries_ci`, `sorted_bar`, `grouped_bar`, `scatter_fit`, `heatmap`, `tornado`, `confusion`) |
 | `scifig/journals.py` | publisher spec table (`journal_style`, `journal_figsize`, `fig_size_mm`) |
 | `scifig/quality.py` | acceptance gate (`check_figure`, `QUALITY_AXES`) |
+| `scifig/polish.py` | editorial polish (`finish_axes`, `finish_figure`, `bar_value_labels`, `tight_ylim`) |
+| `scifig/layout.py` | audit + auto-fix panel overlap / excessive whitespace (`audit_layout`, `fix_layout`) |
+| `scifig/fonts.py` | font detection + cross-platform Arial fallback |
+| `scifig/mcp_server.py` | optional MCP adapter (thin; needs the `mcp` SDK / Python >=3.10) |
 
 ## How an agent should drive scifig
 

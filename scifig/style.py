@@ -20,11 +20,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, Sequence
 
-import matplotlib
 import matplotlib.pyplot as plt
 from cycler import cycler
 
-from .palette import DEFAULT_COLORS, MODERN_COLORS, COLORBLIND_SAFE
+from .palette import COLORBLIND_SAFE, MODERN_COLORS
 
 __all__ = [
     "FigureStyle",
@@ -116,7 +115,10 @@ def apply_publication_style(style: Optional[FigureStyle] = None) -> None:
         }
     )
     if style.font_family:
-        plt.rcParams["font.sans-serif"] = list(style.font_family)
+        # prefer the best actually-installed sans (Arial-like), not a blind list
+        from .fonts import best_sans
+
+        plt.rcParams["font.sans-serif"] = [best_sans(), *style.font_family]
 
 
 def apply_modern_style() -> None:
@@ -146,13 +148,23 @@ def set_palette(palette: str = "modern") -> None:
     """
     palettes = {
         "publication": [
-            "#3A6BC5", "#D4654A", "#4A9F6F", "#DE9E4A", "#B5637D", "#4A9496",
+            "#3A6BC5",
+            "#D4654A",
+            "#4A9F6F",
+            "#DE9E4A",
+            "#B5637D",
+            "#4A9496",
         ],
         "modern": MODERN_COLORS,
         "colorblind": COLORBLIND_SAFE,
         "dark": ["#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB"],
         "pastel": [
-            "#BFDBFE", "#FDE68A", "#A7F3D0", "#FECACA", "#DDD6FE", "#FBCFE8",
+            "#BFDBFE",
+            "#FDE68A",
+            "#A7F3D0",
+            "#FECACA",
+            "#DDD6FE",
+            "#FBCFE8",
         ],
     }
     colors = palettes.get(palette, MODERN_COLORS)

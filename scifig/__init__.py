@@ -14,61 +14,75 @@ Quick start::
     scifig.finalize_figure(fig, "out/fig", formats=["png", "pdf"])
 """
 
-from .style import (
-    FigureStyle,
-    apply_publication_style,
-    apply_modern_style,
-    set_palette,
-    create_subplots,
-    finalize_figure,
-    style_axis,
-    save_figure,
-    set_hidpi,
-    make_figure,
-    nature_single_style,
-    nature_double_style,
-    nature_figsize,
-    NATURE_SINGLE_W,
-    NATURE_HALF_W,
-    NATURE_DOUBLE_W,
+from .archetypes import (
+    confusion,
+    grouped_bar,
+    heatmap,
+    save,
+    scatter_fit,
+    sorted_bar,
+    timeseries_ci,
+    tornado,
 )
-from .palette import (
-    PALETTE,
-    DEFAULT_COLORS,
-    MODERN_COLORS,
-    COLORBLIND_SAFE,
+from .compose import (
+    add_bracket,
+    add_inset,
+    add_panel_label,
+    add_panel_labels,
+    add_sig,
+    join_axes,
+    join_figures,
+    panel_grid,
+    shared_legend,
 )
+from .fonts import PREFERRED_SANS, available_sans, best_sans, font_hint
 from .helpers import (
-    make_grouped_bar,
     annotate_bars,
-    make_trend,
+    make_grouped_bar,
     make_heatmap,
     make_scatter,
     make_sphere_illustration,
+    make_trend,
 )
-from .compose import (
-    panel_grid,
-    join_axes,
-    join_figures,
-    add_panel_label,
-    add_panel_labels,
-    shared_legend,
-    add_inset,
-    add_bracket,
-    add_sig,
+from .journals import JOURNAL_SPEC, fig_size_mm, journal_figsize, journal_style
+from .layout import LayoutReport, audit_layout, fix_layout, layout_report
+from .palette import (
+    COLORBLIND_SAFE,
+    DEFAULT_COLORS,
+    FRIENDLY_PALS,
+    MODERN_COLORS,
+    PALETTE,
+    friendly_pal,
 )
-
-from .semantics import SEMANTIC_ROLES, ROLE_CYCLE, role_color, assign_colors
-from .spec import FigureSpec, render_spec, COLUMN_WIDTHS
-from .journals import JOURNAL_SPEC, journal_style, journal_figsize, fig_size_mm
-from .palette import FRIENDLY_PALS, friendly_pal
-from .archetypes import (
-    timeseries_ci, sorted_bar, grouped_bar, scatter_fit, heatmap, tornado, confusion, save,
-)
-from .quality import check_figure, QualityReport, QUALITY_AXES
 from .polish import (
-    finish_axes, finish_figure, ticks_readable, add_minor_ticks,
-    tight_ylim, soft_grid, bar_value_labels,
+    add_minor_ticks,
+    bar_value_labels,
+    finish_axes,
+    finish_figure,
+    soft_grid,
+    ticks_readable,
+    tight_ylim,
+)
+from .quality import QUALITY_AXES, QualityReport, check_figure
+from .semantics import ROLE_CYCLE, SEMANTIC_ROLES, assign_colors, role_color
+from .spec import COLUMN_WIDTHS, FigureSpec, render_spec
+from .style import (
+    NATURE_DOUBLE_W,
+    NATURE_HALF_W,
+    NATURE_SINGLE_W,
+    FigureStyle,
+    apply_modern_style,
+    apply_publication_style,
+    create_subplots,
+    finalize_figure,
+    make_figure,
+    nature_double_style,
+    nature_figsize,
+    nature_single_style,
+    save_figure,
+    set_hidpi,
+    set_palette,
+    style_axis,
 )
 
 __version__ = "0.3.0"
@@ -140,5 +154,13 @@ __all__ = [
     "tight_ylim",
     "soft_grid",
     "bar_value_labels",
+    "audit_layout",
+    "fix_layout",
+    "layout_report",
+    "LayoutReport",
+    "available_sans",
+    "best_sans",
+    "font_hint",
+    "PREFERRED_SANS",
     "__version__",
 ]

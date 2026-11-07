@@ -9,20 +9,20 @@ hard-coding hex in each script.
 
 from __future__ import annotations
 
-from typing import Iterable, Optional, Sequence
+from typing import Optional, Sequence
 
-from .palette import PALETTE, DEFAULT_COLORS
+from .palette import PALETTE
 
 __all__ = ["SEMANTIC_ROLES", "ROLE_CYCLE", "role_color", "assign_colors"]
 
 
 # Role -> hex. This is the single source of truth for what a color *means*.
 SEMANTIC_ROLES = {
-    "ours": PALETTE["blue_main"],          # proposed / key method
-    "method": PALETTE["blue_main"],        # alias of ours
-    "improvement": PALETTE["green_3"],     # improvement over baseline
+    "ours": PALETTE["blue_main"],  # proposed / key method
+    "method": PALETTE["blue_main"],  # alias of ours
+    "improvement": PALETTE["green_3"],  # improvement over baseline
     "improve": PALETTE["green_3"],
-    "baseline": PALETTE["neutral"],        # reference / background
+    "baseline": PALETTE["neutral"],  # reference / background
     "baseline_strong": PALETTE["red_strong"],  # contrast / strongest baseline
     "contrast": PALETTE["red_strong"],
     "accent": PALETTE["teal"],
