@@ -35,8 +35,6 @@ __all__ = [
     "style_axis",
     "save_figure",
     "set_hidpi",
-    "PUBLICATION_STYLE",
-    "MODERN_STYLE",
 ]
 
 
@@ -58,10 +56,6 @@ def _asset(name: str) -> Path:
 # ---------------------------------------------------------------------------
 # Publication style (figures4papers house)
 # ---------------------------------------------------------------------------
-PUBLICATION_STYLE = "scientific_publication"
-MODERN_STYLE = "modern"
-
-
 def apply_publication_style(style: Optional[FigureStyle] = None) -> None:
     """Apply the publication-house style to matplotlib rcParams.
 

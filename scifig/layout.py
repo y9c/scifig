@@ -27,7 +27,7 @@ import numpy as np
 __all__ = ["audit_layout", "fix_layout", "layout_report", "LayoutReport"]
 
 
-def layout_report(fig, backend="draw"):
+def layout_report(fig):
     """Measure each axes' on-screen bounding box (in pixels)."""
     fig.canvas.draw()
     boxes = {}

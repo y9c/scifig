@@ -69,6 +69,7 @@ plt.style.use("<repo>/scifig/assets/scientific_publication.mplstyle")
 | File / dir | Open when |
 |-----------|----------|
 | [references/figure-guidelines.md](references/figure-guidelines.md) | **FIRST** — how to build any figure as an agent (contract + template) |
+| [references/templates.md](references/templates.md) | **learn-by-example**: universal rules + per-figure-type templates (bars/trend/heatmap/scatter, OO + dict) |
 | [references/api.md](references/api.md) | all scifig function signatures, PALETTE, FigureStyle, validation |
 | [references/cookbook.md](references/cookbook.md) | **code cheatsheet**: 7 figure types, palette hex, multi-panel/inset/stat annotation, mplstyle reference |
 | [references/tutorials.md](references/tutorials.md) | end-to-end flows (bars / trends / heatmap / multi-panel) |

@@ -5,7 +5,7 @@ UV      ?= uv
 PY      ?= python
 VENV    := .venv
 
-.PHONY: setup run test mcp figs lint clean lock
+.PHONY: setup run test mcp figs lint build release clean lock
 
 setup:            ## create the env + install the package (dev + examples extras)
 	$(UV) venv --python 3.11 $(VENV)
@@ -18,8 +18,13 @@ test:             ## run any pytest tests (none yet) + import smoke
 	$(UV) run --python $(VENV)/bin/python -c "import scifig; print('ok', scifig.__version__)"
 
 figs:             ## regenerate all example figures (vector PDFs + preview PNGs)
-	$(UV) run --python $(VENV)/bin/python examples/spec_benchmark.py
-	$(UV) run --python $(VENV)/bin/python examples/immunostruct_ref.py
+	for e in examples/*.py; do $(UV) run --python $(VENV)/bin/python $$e || echo "FAIL: $$e"; done
+
+build:            ## build the wheel + sdist
+	$(UV) build
+
+release: lint build   ## verify then build a distributable
+	echo "Release artifacts in dist/. Publish with: git push -u origin main"
 
 mcp:              ## start the MCP server (needs the mcp extra)
 	$(UV) run --python $(VENV)/bin/python -m scifig.mcp_server
@@ -28,7 +33,7 @@ lint:             ## ruff lint
 	$(UV) run --python $(VENV)/bin/python -m ruff check scifig
 
 clean:            ## remove build artifacts / generated figures
-	rm -rf build dist *.egg-info out
+	rm -rf build dist *.egg-info out .ruff_cache
 
 lock:             ## regenerate uv.lock
 	$(UV) lock --python 3.11

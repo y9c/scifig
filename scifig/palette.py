@@ -68,32 +68,6 @@ COLORBLIND_SAFE = [
     "#CFCFCF",  # Light Gray
 ]
 
-# Second categorical family used by modern.mplstyle's prop_cycle
-MODERN_STYLE_COLORS = [
-    "#2563EB",
-    "#DC2626",
-    "#059669",
-    "#D97706",
-    "#7C3AED",
-    "#DB2777",
-    "#0891B2",
-    "#EA580C",
-    "#65A30D",
-    "#4F46E5",
-]
-
-# scientific_publication.mplstyle prop_cycle
-PUBLICATION_STYLE_COLORS = [
-    "#3A6BC5",
-    "#D4654A",
-    "#4A9F6F",
-    "#DE9E4A",
-    "#B5637D",
-    "#4A9496",
-    "#6A6CB2",
-    "#5A6578",
-]
-
 # ---------------------------------------------------------------------------
 # Named colorblind-safe palettes (pypubfigs / Okabe-Ito derived)
 # ---------------------------------------------------------------------------

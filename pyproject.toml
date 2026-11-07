@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scifig"
-version = "0.3.0"
+version = "0.4.0"
 description = "Publication-grade matplotlib scientific figures, agent-first: declarative spec, archetypes, semantic colors, polish, layout audit, quality gate"
 readme = "README.md"
 license = "MIT"

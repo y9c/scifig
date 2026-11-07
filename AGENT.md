@@ -19,6 +19,7 @@ unified house style.
 | `scifig/helpers.py` | plot primitives (`make_grouped_bar`, `make_trend`, `make_heatmap`, `make_scatter`, `make_sphere_illustration`) |
 | `scifig/compose.py` | panel composition + annotation (`panel_grid`, `join_axes`, `join_figures`, `add_panel_label`, `shared_legend`, `add_inset`, `add_sig`) |
 | `scifig/spec.py` | **declarative** `FigureSpec` + `render_spec` (the agent-facing entry point) |
+| `scifig/figure.py` | **object-oriented** builder: `Figure` + typed `BarPanel`/`TrendPanel`/`HeatmapPanel`/`ScatterPanel` |
 | `scifig/archetypes.py` | callable figure templates (`timeseries_ci`, `sorted_bar`, `grouped_bar`, `scatter_fit`, `heatmap`, `tornado`, `confusion`) |
 | `scifig/journals.py` | publisher spec table (`journal_style`, `journal_figsize`, `fig_size_mm`) |
 | `scifig/quality.py` | acceptance gate (`check_figure`, `QUALITY_AXES`) |
@@ -95,10 +96,17 @@ unified house style.
 
 ## Publish checklist for GitHub
 
-1. `pip clean` any built artifacts; ensure `out/` and `skill/demos/*/figures` are
-   gitignored (`*.png/*.pdf`).
-2. Bump `__version__` in `scifig/__init__.py` and `pyproject.toml` together.
-3. Re-run all `examples/*.py`; confirm each writes a vector PDF.
-4. Update `README.md`, the skill `SKILL.md`/`references/api.md`, and `sources.md`
-   if APIs changed.
-5. Commit and push. Include `LICENSE`, `NOTICE.md`, `AGENT.md`.
+1. **Clean** built/generated artifacts: `rm -rf out dist .ruff_cache` (figures are
+   regenerable; `out/`, `*.png/pdf`, `.ruff_cache`, `.venv` are gitignored).
+2. **Sync version** in `scifig/__init__.py` (`__version__`) and `pyproject.toml`
+   (`version`) — must match.
+3. **Regenerate** `uv.lock` if deps changed (`make lock`).
+4. **Verify** end-to-end: `make lint` (ruff clean), `make figs` (all examples
+   produce a vector PDF), and a dry wheel build (`uv build`).
+5. Confirm `requirements.txt` is gone (uv.lock + pyproject groups are the source
+   of truth). Update `README.md`, `skill/SKILL.md`, `references/api.md`, and
+   `sources.md` if APIs changed.
+6. Commit **all** of: `LICENSE`, `NOTICE.md`, `AGENT.md`, `README.md`,
+   `pyproject.toml`, `uv.lock`, `Makefile`, `docs/architecture.md`, `scifig/`,
+   `skill/`, `examples/`.
+7. Push to your remote: `git remote add origin <url> && git push -u origin main`.

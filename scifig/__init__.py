@@ -35,6 +35,7 @@ from .compose import (
     panel_grid,
     shared_legend,
 )
+from .figure import BarPanel, Figure, HeatmapPanel, Panel, ScatterPanel, TrendPanel
 from .fonts import PREFERRED_SANS, available_sans, best_sans, font_hint
 from .helpers import (
     annotate_bars,
@@ -85,7 +86,7 @@ from .style import (
     style_axis,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "FigureStyle",
@@ -162,5 +163,11 @@ __all__ = [
     "best_sans",
     "font_hint",
     "PREFERRED_SANS",
+    "Figure",
+    "Panel",
+    "BarPanel",
+    "TrendPanel",
+    "HeatmapPanel",
+    "ScatterPanel",
     "__version__",
 ]
