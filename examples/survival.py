@@ -32,16 +32,16 @@ def km(times, events, label, color):
 style()
 fig, ax = plt.subplots(figsize=(4.0, 3.2))
 
-# simulate survival data in two groups
-ctrl_t = rng.exponential(40, 60) + 5
-ctrl_e = (ctrl_t < 50).astype(int)
-trt_t = rng.exponential(70, 60) + 5
-trt_e = (trt_t < 50).astype(int)
+# survival in a realistic 0-90 day window (clipped, so no long empty tail)
+ctrl_t = np.clip(rng.exponential(40, 60) + 5, 0, 90)
+trt_t = np.clip(rng.exponential(70, 60) + 5, 0, 90)
+ctrl_e = (ctrl_t < 70).astype(int)
+trt_e = (trt_t < 70).astype(int)
 
 km(ctrl_t, ctrl_e, "Control", color="#B64342")
 km(trt_t, trt_e, "Treatment", color="#0F4D92")
 ax.set_xlabel("Time (days)"); ax.set_ylabel("Survival probability")
-ax.set_ylim(0, 1.02)
+ax.set_xlim(0, 90); ax.set_ylim(0, 1.02)
 ax.legend(frameon=False, fontsize=6)
 finish(ax, grid=False)
 save(fig, "out/survival", dpi=600)

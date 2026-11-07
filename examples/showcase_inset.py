@@ -16,8 +16,13 @@ from biofigs import volcano
 from proteinfig import matplotlib_cartoon
 
 rng = np.random.default_rng(1)
-log2fc = rng.normal(0, 1.1, 1500)
-pval = np.clip(np.exp(-np.abs(log2fc) * 1.2) + rng.uniform(0, 0.2, 1500), 1e-12, 1.0)
+# realistic DE: most genes near 0, a clear set up-regulated and down-regulated
+log2fc = rng.normal(0, 0.4, 1500)
+log2fc[:400] += rng.choice([-1.5, 1.5], 400) * (0.8 + rng.random(400))  # strong DE
+log2fc[400:520] += rng.choice([-2.0, 2.0], 120) * rng.random(120)        # extreme DE
+# p-value strongly tied to |effect| (so significant genes are visible)
+pval = np.exp(-np.abs(log2fc) * 1.6)
+pval = np.clip(pval + rng.uniform(0, 0.005, 1500), 1e-15, 1.0)
 
 style(font_size=6.0, axes_linewidth=0.8)
 fig, ax = plt.subplots(figsize=(7.2, 7.2 * 0.52))

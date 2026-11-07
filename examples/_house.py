@@ -223,7 +223,8 @@ def heatmap(ax, matrix, x_labels=None, y_labels=None, cmap="magma",
         ax.set_yticklabels(y_labels)
     cb = ax.figure.colorbar(im, ax=ax, shrink=0.82)
     if cbar_label:
-        cb.set_label(cbar_label, rotation=270, labelpad=15)
+        cb.ax.yaxis.set_label_position("right")
+        cb.set_label(cbar_label, rotation=0, labelpad=22, fontsize=plt.rcParams["font.size"])
     if annotate:
         for i in range(m.shape[0]):
             for j in range(m.shape[1]):

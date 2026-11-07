@@ -48,10 +48,10 @@ raw = rng.normal(0, 1, (6, 6))
 corr = raw @ raw.T / 6
 corr = 0.6 * corr / np.max(np.abs(corr))
 np.fill_diagonal(corr, 1.0)
-heatmap(ax_d, corr, x_labels=feats, y_labels=feats, cmap="RdBu_r", cbar_label="Pearson r")
+heatmap(ax_d, corr, x_labels=feats, y_labels=feats, cmap="RdBu_r", cbar_label=None)
 
-# e) ablation bars
-abl = ["Full", "No OCR", "No Chart", "No Audio", "No pretrain"]
+# e) ablation bars (short labels so they don't collide)
+abl = ["Full", "-OCR", "-Chart", "-Audio", "-Pre"]
 grouped_bar(ax_e, abl, [[0.92, 0.86, 0.84, 0.88, 0.71]], ["Ablation"],
             ylabel="Accuracy", annotate=True)
 ax_e.set_ylim(0.6, 1.0)
@@ -67,14 +67,19 @@ panel_letters(axes, case="lower")
 for a in axes:
     finish(a, grid=False)
 
-# shared legend
+# one clean shared legend, placed in reserved space below the grid
 h, l = [], []
 for a in axes:
     hh, ll = a.get_legend_handles_labels()
     for x, y in zip(hh, ll):
         if y not in l:
             l.append(y); h.append(x)
-fig.legend(h, l, loc="lower center", ncol=3, frameon=False, handlelength=1.2)
+for a in axes:
+    if a.get_legend() is not None:
+        a.get_legend().remove()
+fig.subplots_adjust(top=0.94, bottom=0.18, left=0.08)
+fig.legend(h, l, loc="lower center", ncol=7, frameon=False, handlelength=1.0,
+           bbox_to_anchor=(0.5, 0.015))
 
 save(fig, "out/benchmark_nature", formats=("pdf", "png"), dpi=600)
 print("wrote out/benchmark_nature.pdf/png")

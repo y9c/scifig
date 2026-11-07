@@ -140,9 +140,9 @@ def _smooth(c, w=5):
 
 def _ribbon_3d(ax, coords, sse, color, view):
     xy = coords[:, :2] if coords.shape[1] >= 2 else coords
-    ax.plot(xy[:, 0], xy[:, 1], color="0.35", lw=0.6, zorder=2)
-    h = np.where(np.asarray(sse) == "h")[0]
-    for run in _runs(h):
+    # split into runs on index gap OR a large spatial jump (disconnected elements)
+    runs = _runs_geo(np.where(np.asarray(sse) == "h")[0], xy, jump=2.0)
+    for run in runs:
         if len(run) < 4:
             continue
         p = xy[run]
@@ -150,12 +150,34 @@ def _ribbon_3d(ax, coords, sse, color, view):
                 alpha=0.30, zorder=1)
         ax.plot(p[:, 0], p[:, 1], color=color, lw=2.6, zorder=3)
         ax.plot(p[:, 0], p[:, 1], color="white", lw=0.6, zorder=4)
-    e = np.where(np.asarray(sse) == "e")[0]
-    for run in _runs(e):
+    for run in _runs_geo(np.where(np.asarray(sse) == "e")[0], xy, jump=2.0):
         if len(run) < 2:
             continue
-        _arrow(ax, xy[run][0], xy[run][-1], color)
+        p = xy[run]
+        ax.plot(p[:, 0], p[:, 1], color=color, lw=5.0, solid_capstyle="butt",
+                alpha=0.85, zorder=2)
+        ax.plot(p[:, 0], p[:, 1], color="white", lw=0.5, zorder=3)
+        _arrowhead(ax, p[-2], p[-1], color)
     return ax
+
+
+def _runs_geo(idx, xy, jump):
+    """Split sorted indices into runs, breaking when consecutive points jump far."""
+    if len(idx) == 0:
+        return []
+    runs, cur = [], [idx[0]]
+    for i in idx[1:]:
+        break_run = i != cur[-1] + 1
+        if not break_run:
+            d = np.hypot(*(xy[i] - xy[cur[-1]]))
+            break_run = d > jump
+        if break_run:
+            runs.append(cur)
+            cur = [i]
+        else:
+            cur.append(i)
+    runs.append(cur)
+    return runs
 
 
 def _runs(idx):
@@ -172,32 +194,32 @@ def _runs(idx):
     return runs
 
 
-def _arrow(ax, start, end, color):
+def _arrowhead(ax, a, b, color, size=0.9):
+    """Small arrowhead (triangle) at point ``b`` pointing from ``a``->``b``."""
     import matplotlib.patches as mpatches
-    s = np.asarray(start, float)
-    e = np.asarray(end, float)
-    d = e - s
+    a = np.asarray(a, float); b = np.asarray(b, float)
+    d = b - a
     L = np.hypot(*d)
     if L < 1e-6:
         return
     u = d / L
     n = np.array([-u[1], u[0]])
-    w, head = 0.5, min(1.2, L * 0.4)
-    poly = np.array([s + n * w, s - n * w, e - u * head - n * w, e, e - u * head + n * w])
-    ax.add_patch(mpatches.Polygon(poly, closed=True, facecolor=color,
-                                  edgecolor=color, alpha=0.85, zorder=2))
+    tip = b + u * size
+    left = b - n * size * 0.5
+    right = b + n * size * 0.5
+    ax.add_patch(mpatches.Polygon([tip, left, right], closed=True,
+                                  facecolor=color, edgecolor=color, zorder=3))
 
 
 def _demo():
-    """A small folded demo (helices + one sheet) for offline falls backs."""
+    """A compact folded demo (helix bundle) for offline fallback."""
     xy = []
-    for x0, amp in ((1.0, 0.55), (5.0, 0.6), (9.0, 0.5), (13.0, 0.62)):
-        y = np.linspace(1.0, 15.0, 60)
-        x = x0 + amp * np.sin(np.linspace(0, 4 * np.pi, 60))
+    # 5 smooth vertical helices (sine waves), offset in x
+    for x0 in (0.5, 3.5, 6.5, 9.5, 12.5):
+        y = np.linspace(1.0, 14.0, 60)
+        x = x0 + 0.5 * np.sin(np.linspace(0, 5 * np.pi, 60))
         xy.append(np.stack([x, y], axis=1))
-    for y0, dy in ((8.5, 0.0), (10.5, 0.4)):
-        xy.append(np.stack([np.linspace(1.0, 19.0, 40), np.full(40, y0) + np.linspace(0, dy, 40)], axis=1))
     c = np.vstack(xy)
     c = np.hstack([c, np.zeros((c.shape[0], 1))])
-    sse = np.array(list("h" * 240 + "e" * 80))
+    sse = np.array(list("h" * len(c)))
     return c, sse
