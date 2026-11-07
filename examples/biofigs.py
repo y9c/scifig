@@ -1,9 +1,8 @@
-"""Domain figures built with scifig (reference implementations).
+"""Domain figures (reference implementations) — plain matplotlib + house style.
 
-These are **examples**, not package features: they show how to compose
-publication-quality bioinformatics figures from scifig's universal API
-(styles, semantic colors, helpers, polish, compose). An agent reads these and
-re-implements or extends them.
+These are **examples**: they show how to compose publication-quality
+bioinformatics figures from the scifig house style and the `_house` helpers.
+An agent reads these and re-implements or extends them in the user's env.
 
 Covered: volcano, MA plot, marker dot plot, UMAP scatter, per-group violin.
 """
@@ -12,13 +11,13 @@ from __future__ import annotations
 
 import numpy as np
 
-import scifig
+from _house import PALETTE, FRIENDLY
 
 # Semantic up / down / not-significant colors.
 SIGNIFICANT_SCHEME = {
-    "up": scifig.PALETTE["red_strong"],
-    "down": scifig.PALETTE["blue_main"],
-    "ns": scifig.PALETTE["neutral"],
+    "up": PALETTE["red_strong"],
+    "down": PALETTE["blue_main"],
+    "ns": PALETTE["neutral"],
 }
 
 
@@ -62,7 +61,7 @@ def ma_plot(ax, mean_expr, log2fc, pval=None, fc_thresh=1.0, p_thresh=0.05,
         ax.scatter(m[down], fc[down], s=8, c=SIGNIFICANT_SCHEME["down"], alpha=0.8, linewidths=0)
         ax.scatter(m[up], fc[up], s=8, c=SIGNIFICANT_SCHEME["up"], alpha=0.8, linewidths=0)
     else:
-        ax.scatter(m, fc, s=6, c=scifig.PALETTE["blue_main"], alpha=0.6, linewidths=0)
+        ax.scatter(m, fc, s=6, c=PALETTE["blue_main"], alpha=0.6, linewidths=0)
     ax.axhline(0, color="0.4", lw=0.7)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
@@ -93,7 +92,7 @@ def umap_scatter(ax, x, y, labels, palette="tol_bright", size=14, alpha=0.75,
                  xlabel="UMAP-1", ylabel="UMAP-2"):
     """UMAP-style 2-D embedding colored by cluster."""
     labels = np.asarray(labels)
-    pal = scifig.friendly_pal(palette)
+    pal = FRIENDLY.get(palette, FRIENDLY["wong"])
     for i, c in enumerate(dict.fromkeys(labels)):
         m = labels == c
         ax.scatter(np.asarray(x)[m], np.asarray(y)[m], s=size, alpha=alpha,
@@ -113,7 +112,7 @@ def violin_groups(ax, data, groups=None, palette="tol_bright", order=None,
     groups = np.asarray(groups)
     uniq = list(dict.fromkeys(groups)) if order is None else list(order)
     parts = [data[groups == c] for c in uniq]
-    pal = scifig.friendly_pal(palette)
+    pal = FRIENDLY.get(palette, FRIENDLY["wong"])
     bp = ax.violinplot(parts, showmeans=showmeans, showextrema=True, showmedians=True)
     for i, body in enumerate(bp["bodies"]):
         body.set_facecolor(pal[i % len(pal)])

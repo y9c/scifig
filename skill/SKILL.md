@@ -34,44 +34,48 @@ default so the user just confirms; restate the plan in one line before coding.
 
 ## Build a figure
 
+There is no package. Copy the house style (`references/house-style.md`), then
+write the plot with plain matplotlib, adapting the closest example:
+
 ```python
-import scifig
-spec = scifig.FigureSpec(
-    width="double", aspect=0.45, ncols=3, panel_case="lower",
-    panels=[
-        dict(type="bar", categories=[...], series=[[...]], labels=["Our method", "Base"],
-             our_marker="Our method", ylabel="Score"),
-        dict(type="trend", x=..., ys=[...], labels=["Our method", "Base"],
-             our_marker="Our method", ylabel="Val acc", xlabel="Epoch"),
-        dict(type="heatmap", matrix=..., cmap="RdBu_r", cbar_label="r"),
-    ],
-)
-fig, axes = scifig.render_spec(spec, "out/fig")   # -> out/fig.pdf
+# 1) paste the house-style preamble from references/house-style.md
+import matplotlib; matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+# 2) figure at final physical size
+fig, ax = plt.subplots(figsize=(3.5, 2.6))
+# 3) any figure logic (adapt the closest example in examples/)
+ax.bar([0, 1], [0.9, 0.8], color="#0F4D92", edgecolor="black", linewidth=0.5)
+ax.set_ylabel("Accuracy")
+# 4) vector-first save
+fig.savefig("out/fig.pdf", bbox_inches="standard")
 ```
 
-Or object-oriented (`Figure` + `BarPanel`/`TrendPanel`/`HeatmapPanel`/`ScatterPanel`)
-or an archetype (one call: `volcano`, `timeseries_ci`, `sorted_bar`, ...).
+Use the `_house` helpers (`grouped_bar`, `trend`, `heatmap`, `scatter`, `grid`,
+`save`, `finish`, `panel_letters`, ...) for common shapes, and the recipes in
+`examples/` (`biofigs.py`, `proteinfig.py`) for domain figures. The agent reads
+the capability map and the closest recipe, then implements in the user's env.
 
 ## House rules
 
 - **Arial ~5-6pt** at final column width; lowercase Nature letters, uppercase bold
   Science.
-- **Semantic colors**: `assign_colors(labels, ours_marker=...)` — blue=ours,
-  green=improve, red=baseline.
+- **Semantic colors**: blue=key, green=improve, red=baseline.
 - **Vector-first**: PDF default; `pdf.fonttype=42`; `savefig.bbox=standard`.
 - **Readable/minor ticks, subtle grid or off**, thin spines, panel letters at
   the top-left corner.
 - **Reproducible**: read data from a path; no inline data; no AI images.
-- **Run `check_figure`** (no FAIL) and visually confirm before done.
+- **Verify**: re-open the saved figure and confirm no overlap, no clipping,
+  letters clear, legend placed before claiming done.
 
 ## References
 
 | File | Open when |
 |------|-----------|
-| [references/capability-spec.md](references/capability-spec.md) | **FIRST** — what scifig provides, the capability map (built-in vs recipe), universal rules |
-| [references/figure-guidelines.md](references/figure-guidelines.md) | agent contract: ask-first, decision ladder, polish, template |
+| [references/house-style.md](references/house-style.md) | **FIRST** — the look: copy-paste rcParams + helpers + palette |
+| [references/capability-spec.md](references/capability-spec.md) | what figure types are covered (capability map) |
+| [references/figure-guidelines.md](references/figure-guidelines.md) | agent contract: ask-first, decision ladder, polish, verify |
 | [references/templates.md](references/templates.md) | learn-by-example: universal rules + figure-type templates |
-| [references/api.md](references/api.md) | exact function signatures |
+| [references/api.md](references/api.md) | `_house` helper signatures |
 | [../examples/](../../examples/) | runnable recipes to read & adapt |
 
 ## License

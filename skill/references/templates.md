@@ -1,95 +1,80 @@
-# Figure Templates & Universal Rules
+# Figure templates & universal rules
 
-There are far more possible figure combinations than anyone should memorize. The
-point of scifig is that **the templates are few, the rules are universal**, and
-the details (spacing, colors, letters, polish) are baked in. This page is what
-you learn from and reference — copy a template, swap data, done.
+There are far more figure combinations than anyone should memorize. scifig's
+point: **templates are few, rules are universal**, the details (spacing, colors,
+letters, polish) are baked into the house style. Copy a template, swap data, done.
 
-## Universal rules (apply to EVERY figure, regardless of type)
-
-These never change. scifig enforces most of them automatically.
+## Universal rules
 
 | Rule | Detail |
 |------|--------|
-| **Semantic colors** | blue=your method, green=improvement, red/neutral=baseline. Use the semantic palette, never random hex. |
-| **Arial 5-6pt** | at the final column width; lower-case letters (Nature) or upper bold (Science). |
+| **Semantic colors** | blue=key/your method, green=improvement, red/neutral=baseline. Never random hex. |
+| **Arial 5-6pt** | at final column width; lowercase letters (Nature) or uppercase bold (Science). |
 | **Thin spines** | top/right off; ~0.8pt. Interior grid subtle & behind data, or off. |
 | **Readable ticks** | 4-6 major ticks + minor ticks. No matplotlib defaults. |
 | **Units + N + uncertainty** | axis labels carry units; error bars / CI shown. |
-| **Colorblind+grayscale safe** | distinct luminance; add marker/linestyle variety when overlapping. |
-| **Vector-first** | PDF primary; `savefig.bbox='standard'` (exact size). PNG only to preview. |
-| **No overlap, no excess gap** | use `layout='auto'` — scifig measures and fixes. Panel letters at the top-left corner. |
+| **Colorblind+grayscale** | distinct luminance; add marker/linestyle variety when overlapping. |
+| **Vector-first** | PDF primary; `savefig.bbox='standard'`. PNG only to preview. |
+| **No overlap/extra gap** | panel letters at the top-left corner; check spacing on the saved figure. |
 | **One story** | each panel makes one defensible point; don't decorate. |
 
-## Decision ladder (which API)
-
-1. **`FigureSpec` / `render_spec`** — a whole figure from one dict (most common).
-2. **OO `Figure` + typed `*Panel`** — same engine, object-oriented, chainable.
-3. **Archetype** — one figure, one call (`timeseries_ci`, `sorted_bar`, ...).
-4. **Raw helpers** — unusual shape; call `finish_axes` yourself.
-
-## Reference templates by figure type
-
-Each is a filled example showing the OO form (equivalent dict form is the same
-fields in `FigureSpec(panels=[...])`).
+## Reference templates (use the `_house` helpers)
 
 ### Grouped bar (multi-series)
 
 ```python
-fig = Figure(width="single", aspect=1.0, ncols=1)
-fig.add(BarPanel(
-    categories=["VQA", "OCR", "Chart"],
-    series=[[0.92, 0.89, 0.90], [0.83, 0.80, 0.84], [0.78, 0.76, 0.80]],
-    labels=["Our method", "Baseline A", "Baseline B"],
-    our_marker="Our method", ylabel="Accuracy",
-))
-fig.savefig("out/bars")   # -> out/bars.pdf
+from _house import style, grouped_bar, save
+style()
+fig, ax = plt.subplots(figsize=(3.5, 3.5))
+grouped_bar(ax, ["VQA", "OCR"], [[0.92, 0.89], [0.83, 0.80]],
+            ["Our method", "Baseline"], ylabel="Accuracy", ours_marker="Our method")
+save(fig, "out/bars")   # -> out/bars.pdf
 ```
 
 ### Trend / training curve with confidence band
 
 ```python
-fig.add(TrendPanel(
-    x=steps, ys=[train_mean_std, valid_mean_std],
-    labels=["Train", "Valid"], our_marker="Train",
-    ylabel="Accuracy", xlabel="Epoch", show_shadow=True,
-))
+from _house import trend
+# ys entries are 1D or (N,2) mean/std -> draws a CI band
+trend(ax, steps, [train_ms, valid_ms], ["Train", "Valid"],
+      ylabel="Accuracy", xlabel="Epoch", ours_marker="Train")
 ```
 
 ### Heatmap
 
 ```python
-fig.add(HeatmapPanel(matrix=corr, x_labels=feats, y_labels=feats,
-                     cmap="RdBu_r", cbar_label="Pearson r"))
+from _house import heatmap
+heatmap(ax, corr, x_labels=feats, y_labels=feats, cmap="RdBu_r", cbar_label="Pearson r")
 ```
 
-### Scatter (+ optional inset / fit)
+### Scatter
 
 ```python
-fig.add(ScatterPanel(x=latency, y=accuracy, label="Config", size=28))
+from _house import scatter
+scatter(ax, latency, accuracy, label="Config", size=28)
 ```
 
-### Multi-panel figure, shared legend, some panels share y
+### Multi-panel with shared legend
 
 ```python
-fig = Figure(width="double", aspect=0.4, ncols=3, shared_legend=True,
-             share_groups=[[0, 1]])   # panels a,b share y; c independent
-fig.add(BarPanel(...))                # a
-fig.add(BarPanel(...))                # b (shares y with a)
-fig.add(TrendPanel(...))              # c (independent scale)
-fig.savefig("out/multi")
+from _house import grid, panel_letters, finish
+fig, axes = grid(2, 3, width="double", aspect=0.5)
+# ...plot into each axes...
+panel_letters(axes, case="lower")
+for a in axes: finish(a)
 ```
 
 ## When to share vs. not share axes
 
-- **Share y** when panels compare the **same quantity on the same scale** (e.g.
-  two datasets' accuracy) — makes them directly comparable.
+- **Share y** when panels compare the **same quantity on the same scale** —
+  directly comparable.
 - **Don't share** when quantities differ (accuracy vs. loss) — a shared y would
-  squash one panel. Use `share_groups` to share only within same-quantity groups.
+  squash one panel. Share only within same-quantity groups.
 
 ## Go deeper
 
-- [figure-guidelines.md](figure-guidelines.md) — the agent-first generation contract
-- [api.md](api.md) — exact signatures
-- [examples](../../examples/) — runnable reference figures
-- [bio/](../../bio/) — bioinformatics demos
+- [house-style.md](house-style.md) — the look (copy-paste)
+- [capability-spec.md](capability-spec.md) — what's covered
+- [api.md](api.md) — `_house` signatures
+- [figure-guidelines.md](figure-guidelines.md) — agent workflow
+- [../../examples/](../../examples/) — runnable recipes

@@ -1,32 +1,22 @@
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
-.eggs/
-build/
-dist/
-*.egg
-.ruff_cache/
 
 # Virtual envs
 .venv/
 venv/
 env/
 
-# Generated figure outputs (regenerable via examples/ and bio/)
+# Generated figure outputs (regenerable via examples/)
+out/
 figures/
 *.png
 *.pdf
 *.svg
 *.eps
-!examples/**/*.png
-!examples/**/*.pdf
 
 # OS
 .DS_Store
-
-# Original packaged skill zip (contents already unzipped into skill/ and scifig/)
-scientific-figures-skill.zip
 
 # Fetched PDB files (regenerable)
 data_*.pdb

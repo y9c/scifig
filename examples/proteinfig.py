@@ -18,7 +18,7 @@ import tempfile
 
 import numpy as np
 
-import scifig
+from _house import PALETTE
 
 
 def _fetch_pdb_text(pdb_id: str):
@@ -87,7 +87,7 @@ def pymol_cartoon(pdb_id: str, out: str, chain=None, width=2200, height=1800,
     return out
 
 
-def matplotlib_cartoon(ax, pdb_id, chain=None, color=scifig.PALETTE["blue_main"],
+def matplotlib_cartoon(ax, pdb_id, chain=None, color=PALETTE["blue_main"],
                        view=None):
     """Vector matplotlib cartoon from a real PDB (Biotite optional).
 
