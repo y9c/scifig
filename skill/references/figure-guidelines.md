@@ -5,14 +5,39 @@ single source of truth for **how** figures are made — read it before writing a
 figure code. The agent is first-class: it reads this, makes decisions, and
 produces a figure with no hand-tuning of rcParams or per-script style hacks.
 
-## The two mandatory questions
+## Ask before you draw (non-negotiable principle)
 
-Before any code, ask (or infer) these two from the user/context:
+The agent **asks, then acts**. Never start plotting on a guess. If the user
+hasn't answered, ask. Ask up to ~5 focused questions, batch them, and don't
+re-ask what's already known from context. This is the single biggest guard
+against building the wrong figure.
 
-1. **What is the one-line claim?** (the figure must make a single, defensible
-   point — Depth axis.)
-2. **Target venue + column width?** (Nature single/half/double, or a named
-   journal via `journal_style`.) This fixes figsize + font size + panel case.
+### The questions (batch, ask once)
+
+1. **Claim** — what one point must this figure make? (one line)
+2. **Venue + width** — journal? single / half / double / full column? (sets
+   font size + figure dimensions + panel-letter case)
+3. **Panel layout** — how many panels, how arranged (grid, which share axes)?
+4. **Data** — what's the actual table/array? units? N? what's the variable of
+   interest, what's the grouping?
+5. **Chart type per panel** — bar / trend / heatmap / volcano / dotplot / …?
+
+### Ask-principle rules
+
+- **Infer don't guess** — if the answer is unambiguous from context, state your
+  assumption and proceed; only ask what materially changes the figure.
+- **Batch, don't drip** — ask all needed questions in one message.
+- **A wrong guess costs a redo** — when a choice changes layout/scale/color
+  (e.g. sharey or not, log or linear, which series is "ours"), ask.
+- **Offer a default** — each question carries a sensible default so the user can
+  just confirm.
+- **After answers, restate the plan in one line** before coding.
+
+### For bioinformatics figures specifically
+
+Also confirm: organism/species (affects axis units), which genes/cell types are
+highlighted, the exact thresholds (e.g. `log2FC | > 1` and `padj < 0.05` for a
+volcano), and whether points/labels should be colored by category (up/down/n.s.).
 
 ## Fixed decision ladder
 
@@ -112,6 +137,6 @@ scifig.check_figure(fig, axes)
 ## Related
 
 - [api.md](api.md) — exact function signatures
-- [design-theory.md](design-theory.md) — why the style choices exist
-- [common-patterns.md](common-patterns.md) — layout & print-safe patterns
+- [templates.md](templates.md) — universal rules + figure-type templates
 - [../AGENT.md](../AGENT.md) — editing this repo, not making figures
+- [../examples](../../examples/) — runnable reference figures

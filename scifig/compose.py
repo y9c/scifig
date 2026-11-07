@@ -230,7 +230,14 @@ def shared_legend(
         for ax in fig.axes:
             if ax.get_legend() is not None:
                 ax.get_legend().remove()
-    fig.legend(handles, labels, loc=location, ncol=ncol or len(labels), frameon=False, **kw)
+    # compact vertical spacing so a multi-row legend fits its reserved strip
+    kw.setdefault("handlelength", 1.0)
+    kw.setdefault("handleheight", 0.7)
+    kw.setdefault("labelspacing", 0.25)
+    kw.setdefault("borderpad", 0.25)
+    kw.setdefault("handletextpad", 0.4)
+    fig.legend(handles, labels, loc=location, ncol=ncol or len(labels),
+               frameon=False, **kw)
     return fig
 
 

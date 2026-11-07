@@ -34,7 +34,8 @@ class Panel:
 
 class BarPanel(Panel):
     def __init__(self, categories, series, labels, ylabel="Value", annotate=False,
-                 our_marker=None, ylim=None, **kw):
+                 our_marker=None, ylim=None, yerr=None, capsize=3,
+                 hide_xticks=False, **kw):
         self.categories = categories
         self.series = series
         self.labels = labels
@@ -42,11 +43,17 @@ class BarPanel(Panel):
         self.annotate = annotate
         self.our_marker = our_marker
         self.ylim = ylim
+        self.yerr = yerr
+        self.capsize = capsize
+        self.hide_xticks = hide_xticks
         self.kw = kw
 
     def to_panel_dict(self):
         d = dict(type="bar", categories=self.categories, series=self.series,
-                 labels=self.labels, ylabel=self.ylabel, annotate=self.annotate)
+                 labels=self.labels, ylabel=self.ylabel, annotate=self.annotate,
+                 capsize=self.capsize, hide_xticks=self.hide_xticks)
+        if self.yerr is not None:
+            d["yerr"] = self.yerr
         if self.our_marker:
             d["ours_marker"] = self.our_marker
         if self.ylim:

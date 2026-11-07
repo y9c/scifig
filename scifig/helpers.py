@@ -40,6 +40,9 @@ def make_grouped_bar(
     ylabel="Value",
     colors=None,
     annotate=False,
+    yerr=None,
+    capsize=3,
+    hide_xticks=False,
     **bar_kw,
 ):
     """Render grouped bars.
@@ -62,6 +65,10 @@ def make_grouped_bar(
     elw = bar_kw.pop("linewidth", None)
     if elw is None:
         elw = 0.5
+    if yerr is not None and edgecolor == "black":
+        # with error bars, drop the heavy black bar stroke (ecolor carries it)
+        elw = 0.0
+        edgecolor = "none"
 
     n_group = len(s)
     total = 1.0
@@ -70,6 +77,13 @@ def make_grouped_bar(
     last = None
     for gi, (sv, lab) in enumerate(zip(s, labels)):
         offset = (gi - (n_group - 1) / 2.0) * width
+        yerr_gi = None
+        if yerr is not None:
+            ye = np.asarray(yerr, float)
+            if ye.ndim == 2 and ye.shape[0] == len(s):
+                yerr_gi = ye[gi]
+            elif ye.ndim == 1:
+                yerr_gi = ye
         bars = ax.bar(
             x + offset,
             sv,
@@ -78,13 +92,20 @@ def make_grouped_bar(
             color=colors[gi % len(colors)],
             edgecolor=edgecolor,
             linewidth=elw,
+            yerr=yerr_gi,
+            error_kw={"ecolor": "black", "capsize": capsize, "linewidth": 0.7}
+            if yerr_gi is not None else None,
             **bar_kw,
         )
         last = bars
-    ax.set_xticks(x)
-    ax.set_xticklabels(cats)
+    if hide_xticks:
+        ax.set_xticks([])
+    else:
+        ax.set_xticks(x)
+        ax.set_xticklabels(cats)
     ax.set_ylabel(ylabel)
-    ax.legend(frameon=False)
+    if any(str(lab) for lab in labels):
+        ax.legend(frameon=False)
     if annotate and last is not None:
         annotate_bars(ax, last)
     return last

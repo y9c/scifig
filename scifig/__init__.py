@@ -24,6 +24,7 @@ from .archetypes import (
     timeseries_ci,
     tornado,
 )
+from .bio import SIGNIFICANT_SCHEME, dot_plot, ma_plot, umap_scatter, violin_groups, volcano
 from .compose import (
     add_bracket,
     add_inset,
@@ -63,6 +64,13 @@ from .polish import (
     soft_grid,
     ticks_readable,
     tight_ylim,
+)
+from .protein import (
+    demo_structure,
+    draw_topology,
+    fetch_structure,
+    load_structure,
+    ribbon_trace,
 )
 from .quality import QUALITY_AXES, QualityReport, check_figure
 from .semantics import ROLE_CYCLE, SEMANTIC_ROLES, assign_colors, role_color
@@ -169,5 +177,16 @@ __all__ = [
     "TrendPanel",
     "HeatmapPanel",
     "ScatterPanel",
+    "volcano",
+    "ma_plot",
+    "dot_plot",
+    "umap_scatter",
+    "violin_groups",
+    "SIGNIFICANT_SCHEME",
+    "demo_structure",
+    "draw_topology",
+    "fetch_structure",
+    "load_structure",
+    "ribbon_trace",
     "__version__",
 ]

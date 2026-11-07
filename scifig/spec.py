@@ -71,6 +71,7 @@ class FigureSpec:
     font_size: float = 6.0  # base pt (Nature ~5-6)
     axes_linewidth: float = 0.8
     panel_case: str = "lower"  # lower=Nature, upper=Science
+    panel_letters: bool = True  # set False when panels are identified by axis labels
     shared_legend: bool = True
     legend_ncol: Optional[int] = None
     legend_location: str = "lower center"
@@ -108,6 +109,8 @@ def _draw_panel(ax, p: dict, compose, letter: str):
             ax, p["categories"], p["series"], labels,
             ylabel=p.get("ylabel", "Value"), colors=colors,
             annotate=p.get("annotate", False),
+            yerr=p.get("yerr"), capsize=p.get("capsize", 3),
+            hide_xticks=p.get("hide_xticks", False),
         )
         if p.get("annotate"):
             helpers.annotate_bars(ax, bars)
@@ -165,10 +168,19 @@ def render_spec(spec: FigureSpec, out_path: str, formats=None, dpi=600):
                                    axes_linewidth=spec.axes_linewidth)
     apply_publication_style(st)
 
+    # reserve a bottom legend strip sized to how many rows the legend needs
+    legend_height = None
+    if spec.shared_legend:
+        unique = set()
+        for p in spec.panels:
+            unique.update(p.get("labels", []))
+        nlab = spec.legend_ncol or min(n, 3)
+        rows = max(1, int(np.ceil(max(1, len(unique)) / nlab)))
+        legend_height = spec.legend_height * rows
     fig, axes = compose.panel_grid(
         nrows, ncols, figsize=figsize,
         legend="bottom" if spec.shared_legend else None,
-        legend_height=spec.legend_height,
+        legend_height=legend_height,
         wspace=spec.wspace, hspace=spec.hspace,
         sharex=spec.sharex, sharey=spec.sharey, share_groups=spec.share_groups,
     )
@@ -182,7 +194,8 @@ def render_spec(spec: FigureSpec, out_path: str, formats=None, dpi=600):
             from .polish import finish_axes
             finish_axes(ax, grid=p.get("grid", True),
                         minor=p.get("minor", True))
-        compose.add_panel_label(ax, letter, fontweight="bold")
+        if spec.panel_letters:
+            compose.add_panel_label(ax, letter, fontweight="bold")
 
     # hide any unused axes (e.g. when panels don't fill the grid)
     for ax in axes[n:]:
