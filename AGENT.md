@@ -84,6 +84,8 @@ unified house style.
 
 ## Testing / verification
 
+- **Set up the env first**: follow [`docs/install-prompt.md`](docs/install-prompt.md)
+  (uv-based; the agent-facing setup + smoke-test procedure).
 - `examples/*.py` are the smoke tests — each must run and produce a figure.
 - `python -m pytest` is not wired up; run examples directly and inspect output.
 - For a figure change, always regenerate and *visually* confirm (output size,

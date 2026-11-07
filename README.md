@@ -14,6 +14,10 @@ make figs      # regenerate all example figures (vector PDFs)
 Or plain: `pip install -e .` (add `[mcp]` for the MCP server, `[examples]` for scipy).
 `uv.lock` is committed so every machine builds the same environment.
 
+**For an agent (or yourself) doing a fresh setup, give it
+[`docs/install-prompt.md`](docs/install-prompt.md)** — the copy-paste uv
+setup + smoke-test procedure.
+
 ## Quick start
 
 ```python
