@@ -1,42 +1,31 @@
 ---
 name: scifig
-description: quick copy-paste recipes for publication-grade matplotlib figures (no package, no install). Use for paper/slide/report figures.
+description: copy-paste recipes for publication-grade matplotlib figures (no package). Use for paper/slide/report figures.
 ---
 
 # scifig
 
-Publication figures with plain matplotlib. No install. Copy, paste, run.
+Publication figures with plain matplotlib. No package.
 
-## 1. Style (copy once, top of every script)
+## Setup (prove it runs first)
 
-From `references/house-style.md` — copy the **style preamble** + the `save`/`finish`/`panel_label` helpers.
+```bash
+make venv
+cd examples && ../.venv/bin/python grouped_bar.py   # -> out/grouped_bar.pdf
+```
 
-## 2. Pick a recipe (copy + adapt)
+If you get the PDF, you're good.
 
-| Figure | Example |
-|--------|---------|
-| bars | `examples/grouped_bar.py` |
-| trend + CI | `examples/trends_grid.py` |
-| heatmap | `examples/heatmap.py` |
-| scatter + fit | `examples/scatter_fit.py` |
-| box / stacked / pie | `examples/{boxplot,stacked_bar,pie}.py` |
-| ROC / confusion | `examples/{roc,confusion}.py` |
-| survival | `examples/survival.py` |
-| volcano / UMAP / violin | `examples/biofigs.py`, `examples/single_cell/` |
-| protein | `examples/proteinfig.py`, `examples/showcase_protein.py` |
+## Make a figure
 
-## 3. Rules (short)
+Copy the style from `references/house-style.md`. Pick the closest example in `examples/`, copy it, swap the data.
+
+Recipes: bars / box / stacked / pie / trend+CI / heatmap / scatter+fit / ROC / confusion / survival / volcano / UMAP / dot / violin / protein / inset / multi-panel.
+
+## Rules
 
 - Arial ~6pt, lowercase Nature letters.
-- Colors: blue=key, green=improve, red=baseline.
-- Vector PDF first (`savefig.bbox="standard"`).
-- Readable ticks, thin spines, panel letter top-left.
-- Verify: re-open the figure, no overlap.
-
-## 4. Ask first
-
-Ask: claim? venue+width? panels? data? Then implement.
-
----
-
-Docs: `references/capability-spec.md` (what's covered), `references/figure-guidelines.md` (workflow), `references/api.md` (helpers), `references/templates.md`.
+- blue=key, green=improve, red=baseline.
+- save vector PDF (`savefig.bbox="standard"`).
+- Ask first: claim? venue+width? panels? data?
+- Re-open the figure before saying done — no overlap.
