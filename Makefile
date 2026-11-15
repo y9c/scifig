@@ -14,7 +14,7 @@ venv:             ## create a local env with the plotting deps
 
 figs:             ## run every figure example; each writes out/<name>.pdf (+ .png preview)
 	cd examples && for e in *.py; do \
-		case $$e in _house.py|biofigs.py|proteinfig.py|pymol_render_aicda.py) continue;; esac; \
+		case $$e in _house.py|pymol_render_aicda.py) continue;; esac; \
 		echo "== $$e =="; $(FALLBACK) $$e || echo "FAIL: $$e"; \
 	done
 	cd examples && for d in diff_exp single_cell rna_seq; do \

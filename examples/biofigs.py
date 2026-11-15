@@ -124,3 +124,38 @@ def violin_groups(ax, data, groups=None, palette="tol_bright", order=None,
     ax.set_xticklabels([str(c) for c in uniq], rotation=30, ha="right")
     ax.set_ylabel(ylabel)
     return ax
+
+
+if __name__ == "__main__":
+    """Demo: build a 6-panel domain-figure reference and save a vector PDF.
+
+    Runs the volcano / MA / dot / UMAP / violin recipes with synthetic data so
+    `make figs` actually verifies every advertised domain recipe (not just the
+    import). Swap the data for real one in your own figure.
+    """
+    import matplotlib.pyplot as plt
+    from _house import style, figsize, save, panel_letters
+
+    rng = np.random.default_rng(7)
+    n = 600
+    log2fc = rng.normal(0.0, 1.4, n)
+    pval = np.clip(rng.random(n) ** 4, 1e-12, 1.0)
+    genes = np.array([f"G{i}" for i in range(n)])
+
+    style()
+    fig, axes = plt.subplots(2, 3, figsize=figsize("double", aspect=0.62))
+    ax = axes.ravel()
+
+    volcano(ax[0], log2fc, pval, genes, label_top=5)
+    ma_plot(ax[1], np.exp(rng.normal(8.0, 1.0, n)), log2fc, pval)
+    dot_plot(ax[2], rng.random((6, 4)), ["G1", "G2", "G3", "G4", "G5", "G6"],
+             ["C0", "C1", "C2", "C3"], rng.random((6, 4)))
+    umap_scatter(ax[3], rng.normal(0, 1, 300), rng.normal(0, 1, 300),
+                 rng.integers(0, 4, 300))
+    violin_groups(ax[4], rng.normal(0, 1, 400), rng.integers(0, 3, 400))
+    ax[5].axis("off")
+
+    panel_letters(ax)
+    fig.tight_layout()
+    save(fig, "out/biofigs", ("pdf", "png"))
+    print("wrote out/biofigs.pdf + .png")
